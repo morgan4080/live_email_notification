@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+  MYSQL:
+    container_name: mysql8
+    image: mysql:8.1.0
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PW}
+      - MYSQL_DB=${MYSQL_DB}
+    ports:
+      - "3306:3306"
+    restart: always
