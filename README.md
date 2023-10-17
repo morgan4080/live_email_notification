@@ -49,6 +49,9 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 #### Associations:
 
+PLAN - USERS
+
+One plan can have many users (One-to-Many relationship between PLAN and USERS)
 
 
 GROUP - GROUP_CONTACTS - CONTACTS
@@ -102,8 +105,3 @@ One user can have multiple groups (One-to-Many relationship between USERS and US
 One group belongs to one user (One-to-One relationship between GROUPS and USER_GROUPS)
 
 Users and Groups have a one-to-many relationship. One user can have many groups.  One group can only belong to one user.
-
-
-USER - PLANS
-
-One user can have one role (One-to-One relationship between USERS and PLANS)
