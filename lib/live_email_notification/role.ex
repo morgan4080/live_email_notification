@@ -6,5 +6,6 @@ defmodule LiveEmailNotification.Role do
     field :role_description, :string
 
     many_to_many :permissions, LiveEmailNotification.Permission, join_through: "roles_permissions"
+    many_to_many :users, LiveEmailNotification.User, join_through: "users_roles"
   end
 end

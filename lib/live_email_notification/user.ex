@@ -8,6 +8,8 @@ defmodule LiveEmailNotification.User do
     field :msisdn, :string
     field :is_super, :boolean
     field :password_hash, :string
+
     belongs_to :plan, LiveEmailNotification.Plan
+    many_to_many :roles, LiveEmailNotification.Role, join_through: "users_roles"
   end
 end
