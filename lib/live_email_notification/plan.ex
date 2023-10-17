@@ -4,6 +4,7 @@ defmodule LiveEmailNotification.Plan do
   schema "plans" do
     field :plan_name, :string
     field :plan_description, :string
+
     has_many :users, LiveEmailNotification.User
   end
 end
