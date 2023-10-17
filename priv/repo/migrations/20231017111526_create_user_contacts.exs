@@ -5,6 +5,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateUserContacts do
     create table(:users_contacts) do
       add :user_id, references(:users)
       add :contact_id, references(:contacts)
+
+      timestamps()
     end
 
     create unique_index(:users_contacts, [:user_id, :contact_id])

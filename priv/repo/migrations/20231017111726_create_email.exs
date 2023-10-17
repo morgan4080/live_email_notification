@@ -6,6 +6,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateEmail do
       add :subject, :string
       add :content, :string
       add :date_sent, :utc_datetime
+
+      timestamps()
     end
   end
 end

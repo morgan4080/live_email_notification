@@ -5,6 +5,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateGroup do
     create table(:groups) do
       add :group_name, :string
       add :group_description, :string
+
+      timestamps()
     end
   end
 end
