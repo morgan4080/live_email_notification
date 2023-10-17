@@ -3,8 +3,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateRole do
 
   def change do
     create table(:roles) do
-      add :role_name, string
-      add :role_description, string
+      add :role_name, :string
+      add :role_description, :string
     end
   end
 end

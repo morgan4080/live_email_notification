@@ -3,8 +3,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreatePlan do
 
   def change do
     create table(:plans) do
-      add :plan_name, string
-      add :plan_description, string
+      add :plan_name, :string
+      add :plan_description, :string
     end
   end
 end

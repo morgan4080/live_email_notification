@@ -3,8 +3,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateGroup do
 
   def change do
     create table(:groups) do
-      add :group_name, string
-      add :group_description, string
+      add :group_name, :string
+      add :group_description, :string
     end
   end
 end

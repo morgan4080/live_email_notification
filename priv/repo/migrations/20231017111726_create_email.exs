@@ -3,9 +3,9 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateEmail do
 
   def change do
     create table(:emails) do
-      add :subject, string
-      add :content, string
-      add :date_sent, utc_datetime
+      add :subject, :string
+      add :content, :string
+      add :date_sent, :utc_datetime
     end
   end
 end

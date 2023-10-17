@@ -3,8 +3,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateContact do
 
   def change do
     create table(:contacts) do
-      add :contact_name, string
-      add :contact_email, string
+      add :contact_name, :string
+      add :contact_email, :string
     end
   end
 end
