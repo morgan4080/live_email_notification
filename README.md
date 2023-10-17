@@ -105,3 +105,18 @@ One group can have multiple emails (One-to-Many relationship between GROUPS and 
 One email can be attached to multiple groups (One-to-Many relationship between EMAILS and GROUP_EMAILS)
 
 Groups and Emails have a many-to-many relationship. One group can have many emails. One email can be associated with many groups.
+
+USER - USER_GROUPS - GROUPS
+
+One user can have multiple groups (One-to-Many relationship between USERS and USER_GROUPS)
+One group belongs to one user (One-to-One relationship between GROUPS and USER_GROUPS)
+
+Users and Groups have a one-to-many relationship. One user can have many groups.  One group can only belong to one user.
+
+
+GROUP - GROUP_CONTACTS - CONTACTS
+
+One group can have multiple contacts (One-to-Many relationship between GROUPS and GROUP_CONTACTS)
+One contact can be attached to multiple groups (One-to-Many relationship between CONTACTS and GROUP_CONTACTS)
+
+Groups and Contacts have a many-to-many relationship. One group can have many contacts. One contact can be associated with many groups.
