@@ -6,5 +6,7 @@ defmodule LiveEmailNotification.Group do
     field :group_description, :string
 
     belongs_to :user, LiveEmailNotification.User
+    many_to_many :contacts, LiveEmailNotification.Contact, join_through: "groups_contacts"
+    many_to_many :emails, LiveEmailNotification.Email, join_through: "groups_emails"
   end
 end
