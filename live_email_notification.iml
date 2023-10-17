@@ -21,6 +21,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/expo" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/file_system" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/finch" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/gen_smtp" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/gettext" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/hpax" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/jason" />
