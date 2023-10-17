@@ -45,7 +45,7 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 ### Solution 1
 
-![BULK_EMAIL_NOTIFICATIONS_ERD.png](assets%2Fimages%2FBULK_EMAIL_NOTIFICATIONS_ERD.png)
+![BULK_EMAIL_NOTIFICATIONS_ERD.png](assets%2Fimages%2FBULK_EMAIL_NOTIFICATIONS_ERD.jpg)
 
 Associations:
 
