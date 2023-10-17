@@ -2,6 +2,8 @@
   <library name="gen_smtp" type="mix">
     <CLASSES />
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/gen_smtp/src" />
+    </SOURCES>
   </library>
 </component>

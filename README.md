@@ -47,14 +47,61 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 ![BULK_EMAIL_NOTIFICATIONS_ERD.png](assets%2Fimages%2FBULK_EMAIL_NOTIFICATIONS_ERD.png)
 
-Here's how these entities are related:
+Associations:
 
 USERS - USER_ROLES - ROLES:
 
 One user can have multiple roles (One-to-Many relationship between USERS and USER_ROLES).
 One role can be assigned to multiple users (One-to-Many relationship between ROLES and USER_ROLES).
 
+Users and Roles have a many-to-many relationship. One user can have many roles. One role can have many users.
+
 ROLES - ROLE_PERMISSIONS - PERMISSIONS:
 
 One role can have multiple permissions (One-to-Many relationship between ROLES and ROLE_PERMISSIONS).
 One permission can be associated with multiple roles (One-to-Many relationship between PERMISSIONS and ROLE_PERMISSIONS).
+
+Roles and permissions have a one-to-many relationship.
+One role can have many permissions and one permission can be associated with many roles.
+
+USER - PLANS
+
+One user can have one role (One-to-One relationship between USERS and PLANS)
+
+USER - USER_CONTACTS - CONTACTS
+
+One user can have multiple contacts (One-to-Many relationship between USERS and USER_CONTACTS)
+One contact can be attached to multiple users (One-to-Many relationship between CONTACTS and USER_CONTACTS)
+
+Users and Contacts have a many-to-many relationship. One user can have many contacts. One contacts can be associated with many users.
+
+USER - USER_EMAILS - EMAILS
+
+One user can have multiple emails (One-to-Many relationship between USERS and USER_CONTACT_EMAILS)
+One email belongs to one user (One-to-One relationship between EMAILS and USER_CONTACT_EMAILS)
+
+Users and Emails have a one-to-many relationship. One user can have many emails. One email can only belong to one user.
+
+
+USER - USER_GROUPS - GROUPS
+
+One user can have multiple groups (One-to-Many relationship between USERS and USER_GROUPS)
+One group belongs to one user (One-to-One relationship between GROUPS and USER_GROUPS)
+
+Users and Groups have a one-to-many relationship. One user can have many groups.  One group can only belong to one user.
+
+
+GROUP - GROUP_CONTACTS - CONTACTS
+
+One group can have multiple contacts (One-to-Many relationship between GROUPS and GROUP_CONTACTS)
+One contact can be attached to multiple groups (One-to-Many relationship between CONTACTS and GROUP_CONTACTS)
+
+Groups and Contacts have a many-to-many relationship. One group can have many contacts. One contact can be associated with many groups.
+
+
+GROUP - GROUP_EMAILS - EMAILS
+
+One group can have multiple emails (One-to-Many relationship between GROUPS and GROUP_EMAILS)
+One email can be attached to multiple groups (One-to-Many relationship between EMAILS and GROUP_EMAILS)
+
+Groups and Emails have a many-to-many relationship. One group can have many emails. One email can be associated with many groups.
