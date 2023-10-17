@@ -4,7 +4,5 @@ defmodule LiveEmailNotification.Contact do
   schema "contacts"  do
     field :contact_name, :string
     field :contact_email, :string
-
-    belongs_to :user, LiveEmailNotification.User, join_through: "user_contacts"
   end
 end
