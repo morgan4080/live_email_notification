@@ -84,10 +84,10 @@ One role can be assigned to multiple users (One-to-Many relationship between ROL
 
 Users and Roles have a many-to-many relationship. One user can have many roles. One role can have many users.
 
-USER - USER_CONTACTS - CONTACTS
+USER - USERS_CONTACTS - CONTACTS
 
-One user can have multiple contacts (One-to-Many relationship between USERS and USER_CONTACTS)
-One contact can be attached to multiple users (One-to-Many relationship between CONTACTS and USER_CONTACTS)
+One user can have multiple contacts (One-to-Many relationship between USERS and USERS_CONTACTS)
+One contact can be attached to multiple users (One-to-Many relationship between CONTACTS and USERS_CONTACTS)
 
 Users and Contacts have a many-to-many relationship. One user can have many contacts. One contact can be associated with many users.
 
