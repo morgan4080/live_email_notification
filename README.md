@@ -70,12 +70,12 @@ One email can be attached to multiple groups (One-to-Many relationship between E
 Groups and Emails have a many-to-many relationship. One group can have many emails. One email can be associated with many groups.
 
 
-ROLES - ROLE_PERMISSIONS - PERMISSIONS:
+ROLES - ROLES_PERMISSIONS - PERMISSIONS:
 
-One role can have multiple permissions (One-to-Many relationship between ROLES and ROLE_PERMISSIONS).
-One permission can be associated with multiple roles (One-to-Many relationship between PERMISSIONS and ROLE_PERMISSIONS).
+One role can have multiple permissions (One-to-Many relationship between ROLES and ROLES_PERMISSIONS).
+One permission can be associated with multiple roles (One-to-Many relationship between PERMISSIONS and ROLES_PERMISSIONS).
 
-Roles and permissions have a one-to-many relationship. One role can have many permissions and one permission can be associated with many roles.
+Roles and permissions have a many-to-many relationship. One role can have many permissions and one permission can be associated with many roles.
 
 USERS - USER_ROLES - ROLES:
 
