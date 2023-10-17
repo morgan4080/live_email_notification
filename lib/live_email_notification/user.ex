@@ -11,7 +11,7 @@ defmodule LiveEmailNotification.User do
 
     belongs_to :plan, LiveEmailNotification.Plan
     many_to_many :roles, LiveEmailNotification.Role, join_through: "users_roles"
-    has_many :contacts, LiveEmailNotification.Contact, join_through: "users_contacts"
+    many_to_many :contacts, LiveEmailNotification.Contact, join_through: "users_contacts"
     has_many :groups, LiveEmailNotification.Group
   end
 end

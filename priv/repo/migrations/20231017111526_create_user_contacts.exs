@@ -1,4 +1,4 @@
-defmodule LiveEmailNotification.Repo.Migrations.CreateUsersContacts do
+defmodule LiveEmailNotification.Repo.Migrations.CreateUserContacts do
   use Ecto.Migration
 
   def change do
