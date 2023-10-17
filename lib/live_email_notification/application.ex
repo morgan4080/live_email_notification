@@ -1,9 +1,19 @@
 defmodule LiveEmailNotification.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
+  # Application.get_all_env(:live_email_notification) to show all environment variables
+
   @moduledoc false
 
   use Application
+
+  # The start/2 callback has to spawn and link a supervisor and return
+  # {:ok, pid} or {:ok, pid, state},
+  # where pid is the PID of the supervisor, and state is an optional application state.
+  # args is the second element of the tuple given to the :mod option in mix.exs.
+
+  # The type argument passed to start/2 is usually
+  # :normal unless in a distributed setup where application takeovers and failovers are configured.
 
   @impl true
   def start(_type, _args) do
@@ -23,7 +33,7 @@ defmodule LiveEmailNotification.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: LiveEmailNotification.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(children, opts) # returns {:ok, pid} or {:ok, pid, state}
   end
 
   # Tell Phoenix to update the endpoint configuration

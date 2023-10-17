@@ -18,6 +18,8 @@ defmodule LiveEmailNotification.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
+      # configure a callback module that executes custom code
+      # :mod key expects a tuple with application callback module and start argument (commonly [])
       mod: {LiveEmailNotification.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
