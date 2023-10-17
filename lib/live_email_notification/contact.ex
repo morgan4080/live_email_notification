@@ -5,6 +5,6 @@ defmodule LiveEmailNotification.Contact do
     field :contact_name, :string
     field :contact_email, :string
 
-    many_to_many :users, LiveEmailNotification.User, join_through: "users_contacts"
+    belongs_to :user, LiveEmailNotification.User, join_through: "user_contacts"
   end
 end
