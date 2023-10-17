@@ -3,15 +3,18 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateUser do
 
   def change do
     create table(:users) do
-      add :uuid, :string
-      add :first_name, :string
-      add :last_name, :string
-      add :email_address, :string
-      add :msisdn, :string
-      add :is_super, :boolean
-      add :password_hash, :string
+      add :uuid, :string, null: false
+      add :first_name, :string, null: false
+      add :last_name, :string, null: false
+      add :email, :string, null: false, size: 160
+      add :msisdn, :string, null: false
+      add :is_super, :boolean, null: false
+      add :hashed_password, :string, null: false
+      add :confirmed_at, :naive_datetime
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:users, [:email, :msisdn])
   end
 end

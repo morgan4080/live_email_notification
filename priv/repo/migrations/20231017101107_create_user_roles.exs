@@ -6,7 +6,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateUsersRoles do
       add :user_id, references(:users)
       add :role_id, references(:roles)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create unique_index(:users_roles, [:user_id, :role_id])

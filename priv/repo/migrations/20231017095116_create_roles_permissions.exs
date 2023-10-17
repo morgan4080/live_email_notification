@@ -6,7 +6,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateRolesPermissions do
       add :role_id, references(:roles)
       add :permission_id, references(:permissions)
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
 

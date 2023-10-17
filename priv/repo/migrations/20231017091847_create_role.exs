@@ -6,7 +6,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateRole do
       add :role_name, :string
       add :role_description, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end

@@ -6,7 +6,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreatePermission do
       add :permission_name, :string
       add :permission_description, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end

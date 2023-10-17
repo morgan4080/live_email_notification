@@ -6,7 +6,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreatePlan do
       add :plan_name, :string
       add :plan_description, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end
