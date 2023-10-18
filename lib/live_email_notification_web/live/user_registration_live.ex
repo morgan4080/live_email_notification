@@ -11,7 +11,7 @@ defmodule LiveEmailNotificationWeb.UserRegistrationLive do
         Register for an account
         <:subtitle>
           Already registered?
-          <.link navigate={~p"/users/log_in"} class="font-semibold text-brand hover:underline">
+          <.link navigate={~p"/users/log_in"} class="font-semibold text-brand/60 hover:underline">
             Sign in
           </.link>
           to your account now.
@@ -31,8 +31,16 @@ defmodule LiveEmailNotificationWeb.UserRegistrationLive do
           Oops, something went wrong! Please check the errors below.
         </.error>
 
-        <.input field={@form[:email]} type="email" label="Email" required />
-        <.input field={@form[:password]} type="password" label="Password" required />
+        <div class="flex gap-4">
+          <.input field={@form[:first_name]} type="text" placeholder="John" label="First name" required />
+          <.input field={@form[:last_name]} type="text" placeholder="Doe" label="Last name" required />
+        </div>
+        <.input field={@form[:email]} type="email" placeholder="user@example.tld" label="Email" required />
+        <.input field={@form[:msisdn]} type="text" placeholder="254*********" label="Phone no." required />
+        <div class="flex gap-4">
+          <.input field={@form[:password]} type="password" label="Password" required />
+          <.input field={@form[:password_confirmation]} type="password" label="Confirm password" required/>
+        </div>
 
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>

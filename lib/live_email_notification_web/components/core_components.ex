@@ -107,7 +107,7 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
 
   def flash(assigns) do
     assigns = assign_new(assigns, :id, fn -> "flash-#{assigns.kind}" end)
-
+    #CONDITIONAL RENDER
     ~H"""
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
@@ -201,12 +201,12 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-10 space-y-3 bg-white">
         <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+      </div>
+      <div :for={action <- @actions} class="mt-12 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>
         </div>
-      </div>
     </.form>
     """
   end
@@ -410,8 +410,8 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
   def error(assigns) do
     ~H"""
     <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
-      <%= render_slot(@inner_block) %>
+      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-4 w-4 flex-none" />
+      <span class="text-xs"><%= render_slot(@inner_block) %></span>
     </p>
     """
   end

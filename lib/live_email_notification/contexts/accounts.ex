@@ -41,7 +41,10 @@ defmodule LiveEmailNotification.Contexts.Accounts do
       {:ok, %User{}} | {:error, %Ecto.Changeset{}}
   """
   def register_user(attrs) do
-    %User{}
+    %User{
+      first_name: Map.get(attrs, "first_name"),
+      last_name: Map.get(attrs, "last_name")
+    }
     |> User.registration_changeset(attrs)
     |> Repo.insert()
   end

@@ -3,12 +3,14 @@ defmodule LiveEmailNotification.Db.User do
   import Ecto.Changeset
 
   schema "users" do
-    field :uuid, Ecto.UUID
+    field :uuid, Ecto.UUID, default: Ecto.UUID.generate()
     field :first_name, :string
     field :last_name, :string
     field :email, :string
     field :msisdn, :string
-    field :is_super, :boolean
+    field :is_super, :boolean, default: false
+    field :password, :string, virtual: true, redact: true
+    field :password_confirmation, :string, virtual: true
     field :hashed_password, :string
     field :confirmed_at, :string
 
@@ -30,10 +32,10 @@ defmodule LiveEmailNotification.Db.User do
 
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :msisdn])
+    |> cast(attrs, [:email, :msisdn, :password, :password_confirmation])
     |> validate_email(opts)
-    |> validate_password(opts)
     |> validate_msisdn(opts)
+    |> validate_password(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -51,13 +53,14 @@ defmodule LiveEmailNotification.Db.User do
     |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
     |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_confirmation(:password, message: "does not match password")
     |> maybe_hash_password(opts)
   end
   
   defp validate_msisdn(changeset, opts) do
     changeset
     |> validate_required([:msisdn])
-    |> validate_format(:msisdn, ~r/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}+$/, message: "must have the @ sign and no spaces")
+    |> validate_format(:msisdn, ~r/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}+$/, message: "Use a valid phone number")
     |> validate_length(:msisdn, max: 160)
     |> maybe_validate_unique_msisdn(opts)
   end

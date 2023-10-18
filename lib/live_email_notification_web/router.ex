@@ -18,12 +18,6 @@ defmodule LiveEmailNotificationWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", LiveEmailNotificationWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", LiveEmailNotificationWeb do
   #   pipe_through :api
@@ -44,6 +38,12 @@ defmodule LiveEmailNotificationWeb.Router do
       live_dashboard "/dashboard", metrics: LiveEmailNotificationWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  scope "/", LiveEmailNotificationWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/", PageController, :home
   end
 
   ## Authentication routes
@@ -77,8 +77,12 @@ defmodule LiveEmailNotificationWeb.Router do
 
     delete "/users/log_out", UserSessionController, :delete
 
-    live_session :current_user,
-                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user}] do
+    live_session :current_user, on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user}], root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
+      live "/dashboard", DashboardLive, :nil
+      live "/roles", DashboardLive, :nil
+      live "/users", DashboardLive, :nil
+      live "/groups", DashboardLive, :nil
+      live "/emails", DashboardLive, :nil
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
