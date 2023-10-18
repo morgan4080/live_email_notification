@@ -138,5 +138,6 @@
     <orderEntry type="library" name="hpack" level="project" />
     <orderEntry type="library" name="elixir_uuid" level="project" />
     <orderEntry type="library" name="benchfella" level="project" />
+    <orderEntry type="library" name="bcrypt_elixir" level="project" />
   </component>
 </module>
