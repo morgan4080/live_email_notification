@@ -6,9 +6,20 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   import Ecto.Query, warn: true
 
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{User, Role, UserToken, UserNotifier}
+  alias LiveEmailNotification.Db.{User, Contact, Role, UserToken, UserNotifier}
 
   ## Database getters
+
+
+
+  @doc """
+     [%Contact{}]
+  """
+
+  def get_user_contacts do
+    Repo.all(Contact)
+  end
+
 
   @doc """
      [%User{}]

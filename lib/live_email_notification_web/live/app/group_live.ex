@@ -1,4 +1,4 @@
-defmodule LiveEmailNotificationWeb.DashboardLive do
+defmodule LiveEmailNotificationWeb.GroupLive do
   use LiveEmailNotificationWeb, :live_view
 
   alias LiveEmailNotification.Contexts.Accounts
@@ -14,6 +14,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
   end
 
   def mount(_, _session, socket) do
-    {:ok, assign(socket, page_title: "Dashboard")}
+    IO.inspect( socket.assigns.current_path, label: "GROUP")
+    {:ok, assign(socket, page_title: "Group")}
   end
 end

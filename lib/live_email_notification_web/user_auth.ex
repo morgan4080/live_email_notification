@@ -3,6 +3,8 @@ defmodule LiveEmailNotificationWeb.UserAuth do
 
   import Plug.Conn
   import Phoenix.Controller
+#  import Phoenix.LiveView
+#  import Phoenix.Component
 
   alias LiveEmailNotification.Contexts.Accounts
 
@@ -147,6 +149,10 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     {:cont, mount_current_user(socket, session)}
   end
 
+  def on_mount(:mount_current_path, _params, session, socket) do
+    {:cont, current_path_mount(socket, session)}
+  end
+
   def on_mount(:ensure_authenticated, _params, session, socket) do
     socket = mount_current_user(socket, session)
 
@@ -180,6 +186,10 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     end)
   end
 
+  defp current_path_mount(socket, session) do
+    Phoenix.Component.assign(socket, :current_path, session["current_path"]) |> IO.inspect
+  end
+
   @doc """
   Used for routes that require the user to not be authenticated.
   """
@@ -205,6 +215,24 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/users/log_in")
+      |> halt()
+    end
+  end
+
+  @doc """
+  Used for routes that require the user to be an admin.
+
+  Check permissions can_view_user, can_view_permissions, can_view_plans, can_view_groups, can_view_contacts, can_view_emails
+  """
+  def require_authenticated_user_admin(conn, _opts) do
+
+    if conn.assigns[:current_user] do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You are not allowed to view this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()

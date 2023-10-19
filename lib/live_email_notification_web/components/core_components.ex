@@ -147,8 +147,8 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
   def flash_group(assigns) do
     ~H"""
     <div id={@id}>
-      <.flash kind={:info} title="Success!" flash={@flash} />
-      <.flash kind={:error} title="Error!" flash={@flash} />
+      <.flash id="client-success" kind={:info} title="Success!" flash={@flash} />
+      <.flash id="client-err" kind={:error} title="Error!" flash={@flash} />
       <.flash
         id="client-error"
         kind={:error}

@@ -12,6 +12,7 @@ defmodule LiveEmailNotificationWeb.Router do
     plug :put_secure_browser_headers
 
     plug :fetch_current_user
+    plug :set_path
   end
 
   pipeline :api do
@@ -73,18 +74,34 @@ defmodule LiveEmailNotificationWeb.Router do
   end
 
   scope "/", LiveEmailNotificationWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :require_authenticated_user]
 
     delete "/users/log_out", UserSessionController, :delete
 
-    live_session :current_user, on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user}], root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
-      live "/dashboard", DashboardLive, :nil
-      live "/roles", DashboardLive, :nil
-      live "/users", DashboardLive, :nil
-      live "/groups", DashboardLive, :nil
-      live "/emails", DashboardLive, :nil
+    live_session :current_user,
+                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_path},{LiveEmailNotificationWeb.UserAuth, :mount_current_user}],
+                 root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
+      live "/dashboard", DashboardLive, :index
+      live "/groups", GroupLive, :index
+      live "/contacts", ContactLive, :index
+      live "/emails", EmailLive, :index
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
+
+    live_session :require_authenticated_user_admin,
+                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user},{LiveEmailNotificationWeb.UserAuth, :mount_current_path}],
+                 root_layout: {LiveEmailNotificationWeb.Layouts, :admin} do
+      live "/plans", PlanLive, :index
+      live "/roles", RoleLive, :index
+      live "/users", UserLive, :index
+      live "/user/:uuid/emails", EmailLive, :user_emails
+      live "/user/:uuid/contacts", ContactLive, :user_contacts
+      live "/user/:uuid/groups", GroupLive, :user_groups
+    end
+  end
+
+  defp set_path(conn, _opts) do
+    Plug.Conn.put_session(conn, :current_path, conn.request_path)
   end
 end

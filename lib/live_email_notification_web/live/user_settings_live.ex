@@ -5,12 +5,14 @@ defmodule LiveEmailNotificationWeb.UserSettingsLive do
 
   def render(assigns) do
     ~H"""
-    <.header class="text-center">
+    <.header class="text-center pt-10">
       Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
+      <:subtitle>
+        Manage your account email address and password settings.
+      </:subtitle>
     </.header>
 
-    <div class="space-y-12 divide-y">
+    <div class="space-y-12 divide-y pb-20 mx-auto max-w-2xl">
       <div>
         <.simple_form
           for={@email_form}
