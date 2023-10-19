@@ -59,6 +59,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/bcrypt_elixir" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/comeonin" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/elixir_make" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/heroicons_liveview" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="phoenix" level="project" />
@@ -144,5 +145,6 @@
     <orderEntry type="library" name="bcrypt_elixir" level="project" />
     <orderEntry type="library" name="comeonin" level="project" />
     <orderEntry type="library" name="elixir_make" level="project" />
+    <orderEntry type="library" name="heroicons_liveview" level="project" />
   </component>
 </module>

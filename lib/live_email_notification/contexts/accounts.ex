@@ -3,10 +3,8 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   The Accounts context.
   """
 
-  import Ecto.Query, warn: true
-
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{User, Contact, Role, UserToken, UserNotifier}
+  alias LiveEmailNotification.Db.{User, Contact, UserToken, UserNotifier}
 
   ## Database getters
 
@@ -195,6 +193,12 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query)
+    |> Repo.preload(plan: :user)
+    |> Repo.preload(roles: :user)
+    |> Repo.preload(groups: :user)
+    |> Repo.preload(contacts: :user)
+    |> Repo.preload(emails: :user)
+    |> IO.inspect
   end
 
   @doc """

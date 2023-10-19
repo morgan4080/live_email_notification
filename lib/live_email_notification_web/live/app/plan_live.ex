@@ -1,7 +1,7 @@
 defmodule LiveEmailNotificationWeb.PlanLive do
   use LiveEmailNotificationWeb, :live_view
 
-  alias LiveEmailNotification.Contexts.Accounts
+#  alias LiveEmailNotification.Contexts.Accounts
 
   def render(assigns) do
     ~H"""
