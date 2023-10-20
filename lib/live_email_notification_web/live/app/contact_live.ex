@@ -5,8 +5,6 @@ defmodule LiveEmailNotificationWeb.ContactLive do
   alias LiveEmailNotification.Db.{Contact}
   alias LiveEmailNotification.Contexts.Accounts
 
-  import Ecto.Changeset
-
   def render(assigns) do
     ~H"""
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-1 lg:px-8">
@@ -92,9 +90,9 @@ defmodule LiveEmailNotificationWeb.ContactLive do
   def handle_event("create_contact", %{"contact" => contact_params}, socket) do
     if user = Accounts.get_user_by_uid(socket.assigns.current_user.uuid) do
       new_contact = %Contact{contact_name: Map.get(contact_params, "contact_name"), contact_email: Map.get(contact_params, "contact_email")}
-      case new_contact |> Contact.user_contact_changeset(contact_params) |> Repo.insert() do
+      with_user = Map.put(contact_params, "user", user)
+      case new_contact |> Contact.user_contact_changeset(with_user) |> Repo.insert() do
         {:ok, contact} ->
-
           changeset = Contact.user_contact_changeset(contact, %{})
           {:noreply, socket |> assign(check_errors: false) |> assign(trigger_submit: true) |> assign_form(changeset)}
         {:error, %Ecto.Changeset{} = changeset} ->

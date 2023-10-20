@@ -16,9 +16,9 @@ defmodule LiveEmailNotification.Db.User do
 
     belongs_to :plan, LiveEmailNotification.Db.Plan
     many_to_many :roles, LiveEmailNotification.Db.Role, join_through: "users_roles"
-    many_to_many :contacts, LiveEmailNotification.Db.Contact, join_through: "users_contacts"
+    has_many :contacts, LiveEmailNotification.Db.Contact
     has_many :groups, LiveEmailNotification.Db.Group
-    many_to_many :emails, LiveEmailNotification.Db.Email, join_through: "users_emails"
+    has_many :emails, LiveEmailNotification.Db.Email
     timestamps(type: :utc_datetime)
   end
 

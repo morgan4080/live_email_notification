@@ -11,6 +11,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateUser do
       add :is_super, :boolean, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :naive_datetime
+      add :plan_id, references(:plans)
       timestamps(type: :utc_datetime)
     end
 

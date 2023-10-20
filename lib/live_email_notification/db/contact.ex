@@ -5,6 +5,7 @@ defmodule LiveEmailNotification.Db.Contact do
   schema "contacts"  do
     field :contact_name, :string
     field :contact_email, :string
+    field :user_id, :string
 
     many_to_many :users, LiveEmailNotification.Db.User, join_through: "users_contacts", on_delete: :delete_all, on_replace: :delete
     many_to_many :groups, LiveEmailNotification.Db.Group, join_through: "users_groups", on_delete: :delete_all, on_replace: :delete
