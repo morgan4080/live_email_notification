@@ -36,7 +36,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   end
   
   def get_user_by_uid(uid) when is_binary(uid) do
-    Repo.get(User, uid)
+    Repo.get_by(User, uuid: uid)
   end
 
   def get_user_by_email_and_password(email, password)

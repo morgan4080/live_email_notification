@@ -1,8 +1,9 @@
 defmodule LiveEmailNotificationWeb.ContactLive do
   use LiveEmailNotificationWeb, :live_view
 
-#  alias LiveEmailNotification.Repo
+  alias LiveEmailNotification.Repo
   alias LiveEmailNotification.Db.{Contact}
+  alias LiveEmailNotification.Contexts.Accounts
 
   import Ecto.Changeset
 
@@ -75,35 +76,12 @@ defmodule LiveEmailNotificationWeb.ContactLive do
     socket =
       socket
       |> assign(trigger_submit: false, check_errors: false, modal_active: false, page_title: "Contact")
-      |> assign_form(contact_changeset(%Contact{}, %{}))
-
-    IO.inspect(socket.assigns.form, label: "SOCKET_FORM")
-
+      |> assign_form(Contact.user_contact_changeset(%Contact{}, %{}))
     {:ok, socket}
   end
 
-  def validate_email(changeset, _opts) do
-    IO.inspect(changeset, label: "VALIDATING")
-    changeset
-    |> validate_required([:contact_email])
-    |> validate_format(:contact_email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
-    |> validate_length(:contact_email, max: 160)
-  end
-
-  def validate_name(changeset, _opts) do
-    changeset
-    |> validate_required([:contact_name])
-  end
-
-  def contact_changeset(contact, attrs \\ %{}, opts \\ []) do
-    contact
-    |> cast(attrs, [:contact_name, :contact_email])
-    |> validate_email(opts)
-    |> validate_name(opts)
-  end
-
   def handle_event("validate", %{"contact" => contact_params}, socket) do
-    changeset = contact_changeset(
+    changeset = Contact.user_contact_changeset(
       %Contact{},
       contact_params
     )
@@ -112,19 +90,19 @@ defmodule LiveEmailNotificationWeb.ContactLive do
   end
 
   def handle_event("create_contact", %{"contact" => contact_params}, socket) do
-    IO.inspect(contact_params)
-    case %Contact{
-           contact_name: Map.get(contact_params, "contact_name"),
-           contact_email: Map.get(contact_params, "contact_email")
-         }
-         |> contact_changeset(contact_params)
-         |> Repo.insert() do
-      {:ok, contact} ->
-        changeset = contact_changeset(contact, %{})
-        {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
+    if user = Accounts.get_user_by_uid(socket.assigns.current_user.uuid) do
+      new_contact = %Contact{ contact_name: Map.get(contact_params, "contact_name"), contact_email: Map.get(contact_params, "contact_email")}
+      case new_contact |> Contact.user_contact_changeset(contact_params) |> Repo.insert() do
+        {:ok, contact} ->
+
+          changeset = Contact.user_contact_changeset(contact, %{})
+          {:noreply, socket |> assign(check_errors: false) |> assign(trigger_submit: true) |> assign_form(changeset)}
+        {:error, %Ecto.Changeset{} = changeset} ->
+          {:noreply, socket |> assign(check_errors: true) |> assign(trigger_submit: false) |> assign_form(changeset)}
+      end
     end
+
+    {:noreply, socket |> assign(check_errors: true)}
   end
 
   def handle_event("showModal", _, socket) do
