@@ -4,20 +4,9 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   """
 
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{User, Contact, UserToken, UserNotifier}
+  alias LiveEmailNotification.Db.{User, UserToken, UserNotifier}
 
   ## Database getters
-
-
-
-  @doc """
-     [%Contact{}]
-  """
-
-  def get_user_contacts do
-    Repo.all(Contact)
-  end
-
 
   @doc """
      [%User{}]

@@ -43,7 +43,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
                 <dt class="sr-only">Category</dt>
                 <dd class="group-hover:text-blue-200 text-zinc-400">
                   <%= if @current_user.contacts do %>
-                    <span><%= @current_user.contacts %></span>
+                    <span><%= length(@current_user.contacts) %></span>
                   <% end %>
                 </dd>
               </div>
@@ -62,7 +62,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
                 <dt class="sr-only">Category</dt>
                 <dd class="group-hover:text-blue-200 text-zinc-400">
                   <%= if @current_user.contacts do %>
-                    <span><%= @current_user.groups %></span>
+                    <span><%= length(@current_user.groups) %></span>
                   <% end %>
                 </dd>
               </div>
@@ -81,7 +81,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
                 <dt class="sr-only">Category</dt>
                 <dd class="group-hover:text-blue-200 text-zinc-400">
                   <%= if @current_user.emails do %>
-                    <span><%= @current_user.groups %></span>
+                    <span><%= length(@current_user.groups) %></span>
                   <% end %>
                 </dd>
               </div>

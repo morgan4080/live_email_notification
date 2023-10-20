@@ -7,7 +7,7 @@ defmodule LiveEmailNotification.Db.Contact do
     field :contact_email, :string
 
     belongs_to :user, LiveEmailNotification.Db.User
-    belongs_to :group, LiveEmailNotification.Db.Group
+    many_to_many :groups, LiveEmailNotification.Db.Group, join_through: "groups_contacts"
     timestamps(type: :utc_datetime)
   end
 
@@ -31,8 +31,10 @@ defmodule LiveEmailNotification.Db.Contact do
   end
 
   def group_contact_changeset(contact, attrs \\ %{}, opts \\ []) do
+    # needs put_assoc group
     contact
-    |> cast(attrs, [:contact_name, :contact_email, :group_id])
+    |> cast(attrs, [:contact_name, :contact_email])
+    |> put_assoc(:groups, [:groups])
     |> validate_email(opts)
     |> validate_name(opts)
   end

@@ -2,7 +2,7 @@ import Config
 
 # LOADED AT RUN-TIME
 
-config :live_email_notification, :app_name, "Live Email Notifications"
+config :live_email_notification, :app_name, "Mailot"
 config :live_email_notification, :version, "0.0.1"
 
 # config/runtime.exs is executed for all environments, including

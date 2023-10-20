@@ -90,6 +90,80 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
   end
 
   @doc """
+  Renders a dialogue.
+
+  ## Examples
+
+      <.dialogue id="confirm-modal">
+        This is a dialogue.
+      </.dialogue>
+
+  JS commands may be passed to the `:on_cancel` to configure
+  the closing/cancel event, for example:
+
+      <.dialogue id="confirm" on_cancel={JS.navigate(~p"/posts")}>
+        This is another modal.
+      </.dialogue>
+
+  """
+  attr :id, :string, required: true
+  attr :class, :any, default: ""
+  attr :show, :boolean, default: false
+  attr :on_cancel, JS, default: %JS{}
+  slot :inner_block, required: true
+
+  def dialogue(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      phx-mounted={@show && show_modal(@id)}
+      phx-remove={hide_modal(@id)}
+      data-cancel={JS.exec(@on_cancel, "phx-remove")}
+      class="relative z-50 hidden"
+    >
+      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        class="fixed inset-0 overflow-y-auto"
+        aria-labelledby={"#{@id}-title"}
+        aria-describedby={"#{@id}-description"}
+        role="dialog"
+        aria-modal="true"
+        tabindex="0"
+      >
+        <div class="flex min-h-full items-center justify-center">
+          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+            <.focus_wrap
+              id={"#{@id}-container"}
+              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
+              phx-key="escape"
+              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
+              class={[
+                "shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition",
+                @class
+              ]}
+            >
+              <div class="absolute top-6 right-5">
+                <button
+                  phx-click={JS.exec("data-cancel", to: "##{@id}")}
+                  type="button"
+                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
+                  aria-label={gettext("close")}
+                >
+                  <.icon name="hero-x-mark-solid" class="h-5 w-5" />
+                </button>
+              </div>
+              <div id={"#{@id}-content"}>
+                <%= render_slot(@inner_block) %>
+              </div>
+            </.focus_wrap>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
   Renders flash notices.
 
   ## Examples
@@ -455,6 +529,7 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
   attr :rows, :list, required: true
   attr :row_id, :any, default: nil, doc: "the function for generating the row id"
   attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
+  attr :callback, :any, default: nil, doc: "the function for calling method on parent context"
 
   attr :row_item, :any,
     default: &Function.identity/1,
@@ -510,6 +585,14 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
                 >
                   <%= render_slot(action, @row_item.(row)) %>
                 </span>
+              </div>
+            </td>
+          </tr>
+          <tr :if={length(@rows) == 0} class="relative">
+            <td>
+              <div class="absolute w-full left-1/3 -bottom-16 flex items-center">
+                <span class=" pr-6 font-normal">You don't have items in the list.</span>
+                <button phx-click={@callback} type="button"><Heroicons.Outline.plus class="text-teal-500 h-3.5 w-3.5" /></button>
               </div>
             </td>
           </tr>
