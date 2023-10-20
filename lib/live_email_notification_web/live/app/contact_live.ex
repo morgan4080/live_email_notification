@@ -91,7 +91,7 @@ defmodule LiveEmailNotificationWeb.ContactLive do
 
   def handle_event("create_contact", %{"contact" => contact_params}, socket) do
     if user = Accounts.get_user_by_uid(socket.assigns.current_user.uuid) do
-      new_contact = %Contact{ contact_name: Map.get(contact_params, "contact_name"), contact_email: Map.get(contact_params, "contact_email")}
+      new_contact = %Contact{contact_name: Map.get(contact_params, "contact_name"), contact_email: Map.get(contact_params, "contact_email")}
       case new_contact |> Contact.user_contact_changeset(contact_params) |> Repo.insert() do
         {:ok, contact} ->
 
