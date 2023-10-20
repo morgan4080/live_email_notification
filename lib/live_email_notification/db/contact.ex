@@ -25,16 +25,14 @@ defmodule LiveEmailNotification.Db.Contact do
 
   def user_contact_changeset(contact, attrs \\ %{}, opts \\ []) do
     contact
-    |> cast(attrs, [:contact_name, :contact_email])
-    |> put_assoc(:users, attrs[:user])
+    |> cast(attrs, [:contact_name, :contact_email, :user_id])
     |> validate_email(opts)
     |> validate_name(opts)
   end
 
   def group_contact_changeset(contact, attrs \\ %{}, opts \\ []) do
     contact
-    |> cast(attrs, [:contact_name, :contact_email])
-    |> put_assoc(:users, attrs[:group])
+    |> cast(attrs, [:contact_name, :contact_email, :group_id])
     |> validate_email(opts)
     |> validate_name(opts)
   end

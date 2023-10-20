@@ -39,6 +39,7 @@ defmodule LiveEmailNotificationWeb.ContactLive do
               id="create_contact_form"
               phx-submit="create_contact"
               phx-change="validate"
+              phx-trigger-action={@trigger_submit}
               class="-mt-4"
             >
               <.error :if={@check_errors}>
@@ -83,24 +84,23 @@ defmodule LiveEmailNotificationWeb.ContactLive do
       %Contact{},
       contact_params
     )
-    socket = socket |> assign_form(Map.put(changeset, :action, :validate)) |>  assign(trigger_submit: true)
-    {:noreply, socket}
+
+    {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
 
   def handle_event("create_contact", %{"contact" => contact_params}, socket) do
     if user = Accounts.get_user_by_uid(socket.assigns.current_user.uuid) do
-      new_contact = %Contact{contact_name: Map.get(contact_params, "contact_name"), contact_email: Map.get(contact_params, "contact_email")}
-      with_user = Map.put(contact_params, "user", user)
-      case new_contact |> Contact.user_contact_changeset(with_user) |> Repo.insert() do
+      new_contact = %Contact{contact_name: Map.get(contact_params, "contact_name"), contact_email: Map.get(contact_params, "contact_email"), user_id: user.id}
+      case new_contact |> Contact.user_contact_changeset(contact_params) |> Repo.insert() do
         {:ok, contact} ->
-          changeset = Contact.user_contact_changeset(contact, %{})
-          {:noreply, socket |> assign(check_errors: false) |> assign(trigger_submit: true) |> assign_form(changeset)}
+          socket = socket |> assign(trigger_submit: true) |> assign_form(Contact.user_contact_changeset(contact, contact_params))
+          {:noreply, socket}
         {:error, %Ecto.Changeset{} = changeset} ->
-          {:noreply, socket |> assign(check_errors: true) |> assign(trigger_submit: false) |> assign_form(changeset)}
+          {:noreply, assign_form(socket, changeset)}
       end
+    else
+      {:noreply, assign(socket, check_errors: true)}
     end
-
-    {:noreply, socket |> assign(check_errors: true)}
   end
 
   def handle_event("showModal", _, socket) do
