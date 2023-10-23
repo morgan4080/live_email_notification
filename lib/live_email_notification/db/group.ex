@@ -13,7 +13,7 @@ defmodule LiveEmailNotification.Db.Group do
     timestamps(type: :utc_datetime)
   end
 
-  def group_changeset(group_struct, params \\ %{}, opts \\ []) do
+  def group_changeset(group_struct, params \\ %{}, _opts \\ []) do
     group_struct
     |> cast(params, [:group_name, :group_description])
     |> cast_assoc(:contacts, with: &Contact.user_contact_changeset/2)

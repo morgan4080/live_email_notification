@@ -11,7 +11,7 @@ defmodule LiveEmailNotification.Db.Email do
     many_to_many :contacts, Contact, join_through: "contacts_emails", on_replace: :delete
   end
 
-  def email_changeset(email_struct, attrs \\ %{}, opts \\ []) do
+  def email_changeset(email_struct, attrs \\ %{}, _opts \\ []) do
     email_struct
     |> cast(attrs, [:subject, :content])
     |> cast_assoc(:contacts, with: &Contact.user_contact_changeset/2)

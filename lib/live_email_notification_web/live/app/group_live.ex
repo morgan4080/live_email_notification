@@ -151,6 +151,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
            modal_context: Map.get(params, "action"),
            custom_error: nil,
            selected_group: nil,
+           group_contacts: [],
            page_title: "Groups"
          )
       |> assign_form(Group.group_changeset(%Group{}, %{}))
@@ -167,23 +168,45 @@ defmodule LiveEmailNotificationWeb.GroupLive do
 
   def handle_event("showModal", %{ "selected" => group_id, "context" => context }, socket) do
     selected_group = Repo.get_by(Group, id: elem(Integer.parse(group_id), 0))
+                     |> Repo.preload([:contacts])
     %Group{id: id, group_name: group_name, group_description: group_description, contacts: contacts} = selected_group
     preload_group_to_form = %Group{id: id, group_name: group_name, group_description: group_description, contacts: contacts}
     socket = socket
              |> assign(:modal_active, !socket.assigns.modal_active)
              |> assign(:modal_context, context)
+             |> assign(:group_contacts, selected_group.contacts |> Enum.map(&(&1.id)))
              |> assign(:selected_group, selected_group)
              |> assign_form(Group.group_changeset(preload_group_to_form, %{}))
     {:noreply, socket}
   end
 
   def handle_event("validate", %{"group" => group_params}, socket) do
-    changeset = Group.group_changeset(
-      %Group{},
-      group_params
-    )
+    if contact_ids = group_params["contacts"] do
+      selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
+      contacts = Repo.all(from c in Contact,
+                        where: c.id in ^selected_contacts_ints,
+                        select: c) |> Repo.preload([:groups, :emails])
 
-    {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
+      contacts_map = Enum.map(contacts, fn contact ->
+        Map.from_struct(%{contact | groups: []})
+      end)
+
+      group_params = %{group_params | "contacts" => contacts_map}
+
+      changeset = Group.group_changeset(
+        %Group{},
+        group_params
+      )
+
+      {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
+    else
+      changeset = Group.group_changeset(
+        %Group{},
+        group_params
+      )
+
+      {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
+    end
   end
 
   def handle_event("create", %{"group" => group_params}, socket) do
@@ -230,50 +253,45 @@ defmodule LiveEmailNotificationWeb.GroupLive do
   end
 
   def handle_event("update-contacts", %{"group" => group_params}, socket) do
-    if user = socket.assigns.current_user do
-      if group_params["contacts"] do
-        %{"id" => id, "contacts" => contact_ids } = group_params
-        selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
+    if group_params["contacts"] do
+      %{"id" => id, "contacts" => contact_ids } = group_params
+      selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
 
-        group = Repo.get_by(Group, id: elem(Integer.parse(id), 0)) |> Repo.preload([:contacts])
+      group = Repo.get_by(Group, id: elem(Integer.parse(id), 0)) |> Repo.preload([:contacts])
 
-        case upsert_group_contacts(group, selected_contacts_ints) do
-          {:ok, group_id} ->
-            socket = socket
-                     |> assign(trigger_submit: true)
-                     |> assign_form(Group.group_changeset(%Group{}, group_params))
-                     |> put_flash(:info, "Contacts associated successfully.")
-                     |> redirect(to: ~p"/groups")
-            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
-          {:error, message} ->
-            socket = socket
-                     |> assign_form(%Ecto.Changeset{})
-                     |> assign(check_errors: true)
-            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
-        end
-      else
-        %{"id" => id } = group_params
-
-        group = Repo.get_by(Group, id: elem(Integer.parse(id), 0)) |> Repo.preload([:contacts])
-
-        case upsert_group_contacts(group, []) do
-          {:ok, group_id} ->
-            socket = socket
-                     |> assign(trigger_submit: true)
-                     |> assign_form(Group.group_changeset(%Group{}, group_params))
-                     |> put_flash(:info, "Contacts disassociated successfully.")
-                     |> redirect(to: ~p"/groups")
-            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
-          {:error, message} ->
-            socket = socket
-                     |> assign_form(%Ecto.Changeset{})
-                     |> assign(check_errors: true)
-            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
-        end
+      case upsert_group_contacts(group, selected_contacts_ints) do
+        {:ok, _group_id} ->
+          socket = socket
+                   |> assign(trigger_submit: true)
+                   |> assign_form(Group.group_changeset(%Group{}, group_params))
+                   |> put_flash(:info, "Contacts associated successfully.")
+                   |> redirect(to: ~p"/groups")
+          {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+        {:error, _message} ->
+          socket = socket
+                   |> assign_form(%Ecto.Changeset{})
+                   |> assign(check_errors: true)
+          {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
       end
     else
-      IO.inspect("NO USER", label: "NO USER")
-      {:noreply, socket}
+      %{"id" => id } = group_params
+
+      group = Repo.get_by(Group, id: elem(Integer.parse(id), 0)) |> Repo.preload([:contacts])
+
+      case upsert_group_contacts(group, []) do
+        {:ok, _group_id} ->
+          socket = socket
+                   |> assign(trigger_submit: true)
+                   |> assign_form(Group.group_changeset(%Group{}, group_params))
+                   |> put_flash(:info, "Contacts disassociated successfully.")
+                   |> redirect(to: ~p"/groups")
+          {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+        {:error, _message} ->
+          socket = socket
+                   |> assign_form(%Ecto.Changeset{})
+                   |> assign(check_errors: true)
+          {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+      end
     end
   end
 

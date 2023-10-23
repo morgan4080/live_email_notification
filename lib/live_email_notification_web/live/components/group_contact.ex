@@ -1,4 +1,4 @@
-defmodule LiveEmailNotificationWeb.ContactGroup do
+defmodule LiveEmailNotificationWeb.GroupContact do
   use Phoenix.LiveComponent
 
   import LiveEmailNotificationWeb.CoreComponents
@@ -6,8 +6,8 @@ defmodule LiveEmailNotificationWeb.ContactGroup do
   attr :parent_id, :string, required: true
   attr :title, :string, required: true
   attr :message, :string, required: true
-  attr :contact, :any, default: nil
-  attr :contact_groups, :list, default: []
+  attr :group, :any, default: nil
+  attr :group_contacts, :list, default: []
   attr :callback, :any, required: true
 
   def render(assigns) do
@@ -18,18 +18,18 @@ defmodule LiveEmailNotificationWeb.ContactGroup do
             <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise">
               <%=@title %>
             </h1>
-            <p class="text-sm text-slate-500 hover:text-slate-600">Associating contact <%=@selected_contact.contact_name %>: <%=@selected_contact.contact_email %> to groups.</p>
+            <p class="text-sm text-slate-500 hover:text-slate-600">Associating group (<%=@selected_group.group_name %>: <%=@selected_group.group_description %>) to contacts.</p>
           </div>
           <div>
             <button phx-click={@callback} type="button" class="inline-flex justify-center rounded-md text-sm font-semibold p-2 bg-slate-900 text-white hover:bg-slate-700">
-              <span class="flex items-center text-xs">Add Groups</span>
+              <span class="flex items-center text-xs">Add Contacts</span>
             </button>
           </div>
         </div>
         <.simple_form
           for={@form}
-          id="create_contact_form"
-          phx-submit="update-groups"
+          id="create_group_form"
+          phx-submit="update-contacts"
           phx-change="validate"
           phx-trigger-action={@trigger_submit}
           class="-mt-4"
@@ -43,10 +43,10 @@ defmodule LiveEmailNotificationWeb.ContactGroup do
           </.error>
           <.input field={@form[:id]} type="hidden" />
           <.input
-            field={@form[:groups]}
-            label="Groups (hold ⌘/Ctrl + select)"
+            field={@form[:contacts]}
+            label="Contacts (hold ⌘/Ctrl + select)"
             type="selectkv"
-            options={@current_user.groups |> Enum.map(fn group -> %{id: group.id, name: group.group_name, selected: group.id in @contact_groups} end)}
+            options={@current_user.contacts |> Enum.map(fn contact -> %{id: contact.id, name: contact.contact_name, selected: contact.id in @group_contacts} end)}
             multiple
           />
           <:actions>
