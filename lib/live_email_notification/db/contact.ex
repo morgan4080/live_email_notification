@@ -8,8 +8,8 @@ defmodule LiveEmailNotification.Db.Contact do
     field :contact_email, :string
 
     belongs_to :user, User
-    many_to_many :groups, Group, join_through: "group_contact", on_replace: :delete
-    many_to_many :emails, Email, join_through: "contacts_emails", on_replace: :delete
+    many_to_many :groups, Group, join_through: "group_contact", on_delete: :delete_all, on_replace: :delete
+    many_to_many :emails, Email, join_through: "contacts_emails", on_delete: :delete_all, on_replace: :delete
     timestamps(type: :utc_datetime)
   end
 
@@ -31,7 +31,7 @@ defmodule LiveEmailNotification.Db.Contact do
     |> validate_email(opts)
     |> validate_name(opts)
     |> cast_assoc(:groups, with: &Group.group_changeset/2)
-    |> cast_assoc(:emails, with: &Email.email_changeset/2)
+    |> cast_assoc(:emails, with: &Email.email_changeset/2, drop_param: :emails_delete)
   end
 
   def changeset_update_groups(contact, groups) do

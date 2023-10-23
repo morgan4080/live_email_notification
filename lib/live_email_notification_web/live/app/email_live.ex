@@ -54,7 +54,7 @@ defmodule LiveEmailNotificationWeb.EmailLive do
           :if={@modal_active}
           id="email-dialogue"
           show
-          on_cancel={JS.navigate(~p"/emails")}
+          on_cancel={}
           class={[@modal_context == "delete" && "!p-1"]}
         >
         </.dialogue>

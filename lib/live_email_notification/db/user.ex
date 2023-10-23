@@ -2,6 +2,8 @@ defmodule LiveEmailNotification.Db.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias LiveEmailNotification.Db.Customer
+
   schema "users" do
     field :uuid, Ecto.UUID, default: Ecto.UUID.generate()
     field :first_name, :string
@@ -17,6 +19,7 @@ defmodule LiveEmailNotification.Db.User do
     belongs_to :plan, LiveEmailNotification.Db.Plan
     belongs_to :user_type, LiveEmailNotification.Db.UserType
     many_to_many :roles, LiveEmailNotification.Db.Role, join_through: "users_roles"
+    many_to_many :customers, LiveEmailNotification.Db.Customer, join_through: "user_customer", on_delete: :delete_all, on_replace: :delete
     has_many :role_permissions, through: [:roles, :permissions]
     has_many :contacts, LiveEmailNotification.Db.Contact, on_delete: :delete_all, on_replace: :delete
 #    has_many :contacts_emails, through: [:contacts, :emails]
@@ -32,6 +35,18 @@ defmodule LiveEmailNotification.Db.User do
     * `:validate_msisdn` - Validates the uniqueness of the phone number. Set option to false if not needed.
 
   """
+
+  def changeset_update_contacts(user, customers) do
+    user
+    |> cast(%{}, [:email, :msisdn, :password, :password_confirmation, :plan_id, :user_type_id, :invitation_code])
+    |> put_assoc(:customers, customers)
+  end
+
+  def user_changeset(user, params \\ %{}, _opts \\ []) do
+    user
+    |> cast(params, [:email, :msisdn, :password, :password_confirmation, :plan_id, :user_type_id, :invitation_code])
+    |> cast_assoc(:customers, with: &Customer.customer_changeset/2)
+  end
 
   def registration_changeset(user, attrs, opts \\ []) do
     user

@@ -42,7 +42,7 @@ Repo.insert! %Plan{
 
 
 Repo.insert! %UserType{
-  user_type: "super_admin"
+  user_type: "superuser"
 }
 
 Repo.insert! %UserType{

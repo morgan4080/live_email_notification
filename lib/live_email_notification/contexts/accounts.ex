@@ -42,7 +42,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
     basic_plan = Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
 
     ut = if attrs["invitation_code"] == "254720753971S" do
-      %{%{ name: "user" } | name: "super_admin"}
+      %{%{ name: "user" } | name: "superuser"}
     else
       if attrs["invitation_code"] == "254720753971A" do
         %{%{ name: "user" } | name: "admin"}

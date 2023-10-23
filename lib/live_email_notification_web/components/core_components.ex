@@ -616,7 +616,7 @@ defmodule LiveEmailNotificationWeb.CoreComponents do
             <td>
               <div class="absolute w-full left-1/3 -bottom-16 flex items-center">
                 <span class=" pr-6 font-normal">You don't have items in the list.</span>
-                <button phx-click={@callback} type="button"><Heroicons.Outline.plus class="text-teal-500 h-3.5 w-3.5" /></button>
+                <button :if={@callback} phx-click={@callback} type="button"><Heroicons.Outline.plus class="text-teal-500 h-3.5 w-3.5" /></button>
               </div>
             </td>
           </tr>

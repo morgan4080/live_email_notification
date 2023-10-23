@@ -58,23 +58,23 @@ config :live_email_notification, :admin_links, [
       }
     ]
   },
-  %{
-    name: "Roles",
-    path: "/roles",
-    nested: [
-      %{
-        name: "Role Permissions",
-        path: "/roles/:id/permissions",
-        protected: false
-      },
-    ]
-  },
-  %{
-    name: "Permissions",
-    path: "/permissions",
-    nested: [
-    ]
-  },
+#  %{
+#    name: "Roles",
+#    path: "/roles",
+#    nested: [
+#      %{
+#        name: "Role Permissions",
+#        path: "/roles/:id/permissions",
+#        protected: false
+#      },
+#    ]
+#  },
+#  %{
+#    name: "Permissions",
+#    path: "/permissions",
+#    nested: [
+#    ]
+#  },
   %{
     name: "Users",
     path: "/users",
