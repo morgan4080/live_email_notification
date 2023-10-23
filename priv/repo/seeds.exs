@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias LiveEmailNotification.Db.Plan
+alias LiveEmailNotification.Db.{Plan, UserType}
 alias LiveEmailNotification.Repo
 
 Repo.insert! %Plan{
@@ -38,4 +38,17 @@ Repo.insert! %Plan{
   plan_name: "Gold",
   price: 1000.0,
   plan_description: "Best plan"
+}
+
+
+Repo.insert! %UserType{
+  user_type: "super_admin"
+}
+
+Repo.insert! %UserType{
+  user_type: "admin"
+}
+
+Repo.insert! %UserType{
+  user_type: "user"
 }

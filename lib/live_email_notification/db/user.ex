@@ -8,13 +8,13 @@ defmodule LiveEmailNotification.Db.User do
     field :last_name, :string
     field :email, :string
     field :msisdn, :string
-    field :is_super, :boolean, default: false
     field :password, :string, virtual: true, redact: true
     field :password_confirmation, :string, virtual: true
     field :hashed_password, :string
     field :confirmed_at, :string
 
     belongs_to :plan, LiveEmailNotification.Db.Plan
+    belongs_to :user_type, LiveEmailNotification.Db.UserType
     many_to_many :roles, LiveEmailNotification.Db.Role, join_through: "users_roles"
     has_many :role_permissions, through: [:roles, :permissions]
     has_many :contacts, LiveEmailNotification.Db.Contact, on_delete: :delete_all, on_replace: :delete
@@ -33,7 +33,7 @@ defmodule LiveEmailNotification.Db.User do
 
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :msisdn, :password, :password_confirmation])
+    |> cast(attrs, [:email, :msisdn, :password, :password_confirmation, :plan_id, :user_type_id])
     |> validate_email(opts)
     |> validate_msisdn(opts)
     |> validate_password(opts)

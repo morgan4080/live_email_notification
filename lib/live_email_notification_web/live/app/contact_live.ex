@@ -71,7 +71,7 @@ defmodule LiveEmailNotificationWeb.ContactLive do
             :if={@modal_context == "group"}
             module={LiveEmailNotificationWeb.ContactGroup}
             id="add_group_contact"
-            title="Add Contact to Group"
+            title="Add Contact to Groups"
             contact={@selected_contact}
             form={@form}
             current_user={@current_user}
@@ -97,12 +97,27 @@ defmodule LiveEmailNotificationWeb.ContactLive do
             parent_id="contact-dialogue"
             title="Delete Contact"
             message="Are you sure you want to delete contact? This action cannot be undone."
-            contact={@selected_contact}
+            subject={@selected_contact.contact_email}
+            subject_id={@selected_contact.id}
             error={@custom_error}
           />
         </.dialogue>
       </div>
     """
+  end
+
+  def upsert_contact_groups(contact, group_ids) when is_list(group_ids) do
+    groups = Group |> where([g], g.id in ^group_ids) |> Repo.all()
+
+    with {:ok, _struct} <-
+           contact
+           |> Contact.changeset_update_groups(groups)
+           |> Repo.update() do
+      {:ok, Repo.get_by(Contact, id: contact.id)}
+    else
+      error ->
+        {:error, error}
+    end
   end
 
   def assign_form(socket, %Ecto.Changeset{} = changeset) do
@@ -238,88 +253,49 @@ defmodule LiveEmailNotificationWeb.ContactLive do
 
   def handle_event("update-groups", %{"contact" => contact_params}, socket) do
     if user = socket.assigns.current_user do
-      if group_ids = contact_params["groups"] do
+      if contact_params["groups"] do
+        %{"id" => id, "groups" => group_ids } = contact_params
         selected_groups_ints = Enum.map(group_ids, fn group -> elem(Integer.parse(group), 0) end)
-        groups = Repo.all(from g in Group,
-                          where: g.id in ^selected_groups_ints,
-                          select: g) |> Repo.preload([:contacts])
-
-        groups_map = Enum.map(groups, fn group ->
-          IO.inspect(group, label: "GROUPS")
-#          Map.from_struct(%{group | contacts: []})
-          %{id: group.id, group_name: group.group_name, group_description: group.group_description, user_id: group.user_id}
-        end)
-
-        IO.inspect(groups_map, label: "GROUPSsss")
-
-        # collect all changes other changes along with the groups list
-
-        contact_params = %{contact_params | "groups" => groups_map}
-
-        # get contact and preload
-
-        %{"id" => id } = contact_params
 
         contact = Repo.get_by(Contact, id: elem(Integer.parse(id), 0)) |> Repo.preload([:groups, :emails])
 
-        # create a changeset from the contact and the changes to update
-
-        changeset = Contact.user_contact_changeset(
-          contact,
-          contact_params
-        )
-
-        IO.inspect(changeset, label: "CHANGESET")
-
-        {:noreply, socket}
-
-#        if changeset.valid? do
-#          case changeset |> Repo.update() do
-#            {:ok, contact} ->
-#              socket = socket
-#                       |> assign(trigger_submit: true)
-#                       |> assign_form(Contact.user_contact_changeset(contact, contact_params))
-#                       |> put_flash(:info, "Group associated successfully.")
-#                       |> redirect(to: ~p"/contacts")
-#              {:noreply, assign_form(socket, Map.put(changeset, :action, :update))}
-#            {:error, %Ecto.Changeset{} = changeset} ->
-#              socket = socket
-#                       |> assign_form(changeset)
-#                       |> assign(check_errors: true)
-#              {:noreply, assign_form(socket, Map.put(changeset, :action, :update))}
-#          end
-#        else
-#          changeset = Contact.user_contact_changeset(
-#            contact,
-#            contact_params
-#          )
-#          {
-#            :noreply,
-#            assign_form(socket, Map.put(changeset, :action, :update))
-#            |> assign(custom_error: "Invalid changes check errors")
-#          }
-#        end
+        case upsert_contact_groups(contact, selected_groups_ints) do
+          {:ok, contact_id} ->
+            socket = socket
+                     |> assign(trigger_submit: true)
+                     |> assign_form(Contact.user_contact_changeset(%Contact{}, contact_params))
+                     |> put_flash(:info, "Groups associated successfully.")
+                     |> redirect(to: ~p"/contacts")
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+          {:error, message} ->
+            socket = socket
+                     |> assign_form(%Ecto.Changeset{})
+                     |> assign(check_errors: true)
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+        end
       else
         %{"id" => id } = contact_params
-        contact = Repo.get_by(Contact, id: elem(Integer.parse(id), 0)) |> Repo.preload([:groups, :emails])
-        Contact.user_contact_changeset(
-          contact,
-          contact_params
-        ) |> Repo.update()
-        socket = socket
-                  |> assign(trigger_submit: true)
-                  |> assign(:modal_active, !socket.assigns.modal_active)
-                  |> put_flash(:info, "Contact updated successfully.")
-                  |> redirect(to: ~p"/contacts")
 
-        {:noreply, socket}
+        contact = Repo.get_by(Contact, id: elem(Integer.parse(id), 0)) |> Repo.preload([:groups, :emails])
+
+        case upsert_contact_groups(contact, []) do
+          {:ok, contact_id} ->
+            socket = socket
+                     |> assign(trigger_submit: true)
+                     |> assign_form(Contact.user_contact_changeset(%Contact{}, contact_params))
+                     |> put_flash(:info, "Groups disassociated successfully.")
+                     |> redirect(to: ~p"/contacts")
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+          {:error, message} ->
+            socket = socket
+                     |> assign_form(%Ecto.Changeset{})
+                     |> assign(check_errors: true)
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+        end
       end
     else
-      changeset = Contact.user_contact_changeset(
-        %Contact{},
-        contact_params
-      )
-      {:noreply, assign(socket, custom_error: "User not found", check_errors: true)}
+      IO.inspect("NO USER", label: "NO USER")
+      {:noreply, socket}
     end
   end
 

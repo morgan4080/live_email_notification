@@ -26,7 +26,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
               </div>
               <div>
                 <dt class="sr-only">Plan</dt>
-                <dd class="group-hover:text-blue-200 text-zinc-400"><%= @current_user.plan %></dd>
+                <dd class="group-hover:text-blue-200 text-zinc-400"><%= @current_user.plan.plan_name %></dd>
               </div>
             </dl>
           </li>

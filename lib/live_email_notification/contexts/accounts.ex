@@ -2,9 +2,9 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   @moduledoc """
   The Accounts context.
   """
-
+  import Ecto.Query
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{User, UserToken, UserNotifier}
+  alias LiveEmailNotification.Db.{User, UserToken, UserNotifier, Plan, UserType}
 
   ## Database getters
 
@@ -39,9 +39,13 @@ defmodule LiveEmailNotification.Contexts.Accounts do
       {:ok, %User{}} | {:error, %Ecto.Changeset{}}
   """
   def register_user(attrs) do
+    basic_plan = Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
+    user_type = UserType |> where([type], type.user_type == "user") |> Repo.all() |> List.last()
     %User{
       first_name: Map.get(attrs, "first_name"),
-      last_name: Map.get(attrs, "last_name")
+      last_name: Map.get(attrs, "last_name"),
+      plan_id: basic_plan.id,
+      user_type_id: user_type.id
     }
     |> User.registration_changeset(attrs)
     |> Repo.insert()
@@ -182,7 +186,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query)
-    |> Repo.preload([:plan, :roles, :groups, :contacts, :role_permissions, :contacts_emails])
+    |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :contacts_emails])
   end
 
   @doc """

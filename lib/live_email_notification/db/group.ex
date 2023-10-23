@@ -9,16 +9,20 @@ defmodule LiveEmailNotification.Db.Group do
     field :group_description, :string
 
     belongs_to :user, User
-    many_to_many :contacts, Contact, join_through: "groups_contacts"
+    many_to_many :contacts, Contact, join_through: "group_contact", on_replace: :delete
     timestamps(type: :utc_datetime)
   end
 
   def group_changeset(group_struct, params \\ %{}, opts \\ []) do
-    IO.inspect(group_struct, label: "group_struct")
-
     group_struct
     |> cast(params, [:group_name, :group_description])
     |> cast_assoc(:contacts, with: &Contact.user_contact_changeset/2)
     |> validate_required([:group_name])
+  end
+
+  def changeset_update_contacts(group, contacts) do
+    group
+    |> cast(%{}, [:group_name, :group_description])
+    |> put_assoc(:contacts, contacts)
   end
 end

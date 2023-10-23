@@ -8,10 +8,10 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateUser do
       add :last_name, :string, null: false
       add :email, :string, null: false, size: 160
       add :msisdn, :string, null: false, size: 160
-      add :is_super, :boolean, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :naive_datetime
       add :plan_id, references(:plans)
+      add :user_type_id, references(:user_types)
       timestamps(type: :utc_datetime)
     end
 

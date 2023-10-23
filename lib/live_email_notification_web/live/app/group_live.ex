@@ -1,8 +1,8 @@
 defmodule LiveEmailNotificationWeb.GroupLive do
   use LiveEmailNotificationWeb, :live_view
-#  import Ecto.Query
+  import Ecto.Query
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{Group}
+  alias LiveEmailNotification.Db.{Group, Contact}
 
   def render(assigns) do
     ~H"""
@@ -67,10 +67,59 @@ defmodule LiveEmailNotificationWeb.GroupLive do
             trigger_submit={@trigger_submit}
             check_errors={@check_errors}
           />
+          <.live_component
+            :if={@modal_context == "group"}
+            module={LiveEmailNotificationWeb.GroupContact}
+            id="add_contact_group"
+            title="Add Group to Contacts"
+            contact={@selected_group}
+            form={@form}
+            current_user={@current_user}
+            trigger_submit={@trigger_submit}
+            group_contacts={@group_contacts}
+            selected_group={@selected_group}
+            check_errors={@check_errors}
+            callback={JS.navigate(~p"/contacts?action=add")}
+          />
+          <.live_component
+            :if={@modal_context == "edit"}
+            module={LiveEmailNotificationWeb.UpdateGroup}
+            id="update_group"
+            form={@form}
+            current_user={@current_user}
+            trigger_submit={@trigger_submit}
+            check_errors={@check_errors}
+          />
+          <.live_component
+            :if={@modal_context == "delete"}
+            module={LiveEmailNotificationWeb.DeleteConfirm}
+            id="delete_group"
+            parent_id="group-dialogue"
+            title="Delete Group"
+            message="Are you sure you want to delete group? This action cannot be undone."
+            subject={@selected_group.group_name}
+            subject_id={@selected_group.id}
+            error={@custom_error}
+          />
         </.dialogue>
       </div>
     """
   end
+
+  def upsert_group_contacts(group, contact_ids) when is_list(contact_ids) do
+    contacts = Contact |> where([c], c.id in ^contact_ids) |> Repo.all()
+
+    with {:ok, _struct} <-
+           group
+           |> Group.changeset_update_contacts(contacts)
+           |> Repo.update() do
+      {:ok, Repo.get_by(Group, id: group.id)}
+    else
+      error ->
+        error
+    end
+  end
+
 
   def assign_form(socket, %Ecto.Changeset{} = changeset) do
     form = to_form(changeset, as: "group")
@@ -157,6 +206,91 @@ defmodule LiveEmailNotificationWeb.GroupLive do
       end
     else
       {:noreply, assign(socket, check_errors: true)}
+    end
+  end
+
+  def handle_event("update", %{"group" => group_params}, socket) do
+    try do
+      %{"id" => id,"group_name" => group_name, "group_description" => group_description} = group_params
+      g_id = elem(Integer.parse(id), 0)
+      from(group in Group, where: group.id == ^g_id, update: [set: [group_name: ^group_name, group_description: ^group_description]])
+      |> Repo.update_all([])
+      socket = socket
+               |> assign(trigger_submit: true)
+               |> assign(:modal_active, !socket.assigns.modal_active)
+               |> put_flash(:info, "Group updated successfully.")
+               |> redirect(to: ~p"/groups")
+      {:noreply, socket}
+    catch
+      message ->
+        socket = socket
+                 |> assign(:custom_error, message)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("update-contacts", %{"group" => group_params}, socket) do
+    if user = socket.assigns.current_user do
+      if group_params["contacts"] do
+        %{"id" => id, "contacts" => contact_ids } = group_params
+        selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
+
+        group = Repo.get_by(Group, id: elem(Integer.parse(id), 0)) |> Repo.preload([:contacts])
+
+        case upsert_group_contacts(group, selected_contacts_ints) do
+          {:ok, group_id} ->
+            socket = socket
+                     |> assign(trigger_submit: true)
+                     |> assign_form(Group.group_changeset(%Group{}, group_params))
+                     |> put_flash(:info, "Contacts associated successfully.")
+                     |> redirect(to: ~p"/groups")
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+          {:error, message} ->
+            socket = socket
+                     |> assign_form(%Ecto.Changeset{})
+                     |> assign(check_errors: true)
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+        end
+      else
+        %{"id" => id } = group_params
+
+        group = Repo.get_by(Group, id: elem(Integer.parse(id), 0)) |> Repo.preload([:contacts])
+
+        case upsert_group_contacts(group, []) do
+          {:ok, group_id} ->
+            socket = socket
+                     |> assign(trigger_submit: true)
+                     |> assign_form(Group.group_changeset(%Group{}, group_params))
+                     |> put_flash(:info, "Contacts disassociated successfully.")
+                     |> redirect(to: ~p"/groups")
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+          {:error, message} ->
+            socket = socket
+                     |> assign_form(%Ecto.Changeset{})
+                     |> assign(check_errors: true)
+            {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
+        end
+      end
+    else
+      IO.inspect("NO USER", label: "NO USER")
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("delete", %{ "selected" => group_id}, socket) do
+    try do
+      gro_id = elem(Integer.parse(group_id), 0)
+      Repo.delete_all from(group in Group, where: group.id == ^gro_id)
+      socket = socket
+               |> assign(:modal_active, !socket.assigns.modal_active)
+               |> put_flash(:info, "Group deleted successfully.")
+               |> redirect(to: ~p"/groups")
+      {:noreply, socket}
+    catch
+      message ->
+        socket = socket
+                 |> assign(:custom_error, message)
+        {:noreply, socket}
     end
   end
 end

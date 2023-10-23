@@ -11,9 +11,6 @@ defmodule LiveEmailNotification.Db.Plan do
     has_many :users, LiveEmailNotification.Db.User, on_delete: :delete_all, on_replace: :delete
   end
 
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
   def plan_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:plan_name, :price, :plan_description])

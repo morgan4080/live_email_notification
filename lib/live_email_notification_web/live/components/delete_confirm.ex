@@ -9,6 +9,8 @@ defmodule LiveEmailNotificationWeb.DeleteConfirm do
   attr :parent_id, :string, required: true
   attr :title, :string, required: true
   attr :message, :string, required: true
+  attr :subject, :string, required: true #contact.contact_email
+  attr :subject_id, :string, required: true #contact.id
 
   def render(assigns) do
     ~H"""
@@ -24,7 +26,7 @@ defmodule LiveEmailNotificationWeb.DeleteConfirm do
               <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title"><%= @title %></h3>
               <div class="mt1">
                 <small class="text-gray-400">
-                  <%= @contact.contact_email %>
+                  <%= @subject %>
                 </small>
               </div>
               <div class="mt-2">
@@ -37,7 +39,7 @@ defmodule LiveEmailNotificationWeb.DeleteConfirm do
           </div>
         </div>
         <div class="bg-gray-50 rounded-b-2xl px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-          <button phx-click="delete" phx-value-selected={@contact.id} type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
+          <button phx-click="delete" phx-value-selected={@subject_id} type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
           <button phx-click={JS.exec("data-cancel", to: "##{@parent_id}")} type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
         </div>
       </div>

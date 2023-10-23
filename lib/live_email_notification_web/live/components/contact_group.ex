@@ -18,7 +18,7 @@ defmodule LiveEmailNotificationWeb.ContactGroup do
             <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise">
               <%=@title %>
             </h1>
-            <p class="text-sm text-slate-500 hover:text-slate-600">Associating contact <%=@selected_contact.contact_email %> to group.</p>
+            <p class="text-sm text-slate-500 hover:text-slate-600">Associating contact <%=@selected_contact.contact_name %>: <%=@selected_contact.contact_email %> to group.</p>
           </div>
           <div>
             <button phx-click={@callback} type="button" class="inline-flex justify-center rounded-md text-sm font-semibold p-2 bg-slate-900 text-white hover:bg-slate-700">
@@ -42,8 +42,6 @@ defmodule LiveEmailNotificationWeb.ContactGroup do
             <% end %>
           </.error>
           <.input field={@form[:id]} type="hidden" />
-          <.input field={@form[:contact_name]} label="Contact name" type="text" />
-          <.input field={@form[:contact_email]} label="Contact email" type="email" />
           <.input
             field={@form[:groups]}
             label="Groups (hold ⌘/Ctrl + select)"
