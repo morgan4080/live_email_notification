@@ -37,6 +37,7 @@ defmodule LiveEmailNotificationWeb.UserRegistrationLive do
         </div>
         <.input field={@form[:email]} type="email" placeholder="user@example.tld" label="Email" required />
         <.input field={@form[:msisdn]} type="text" placeholder="254*********" label="Phone no." required />
+        <.input field={@form[:invitation_code]} type="text" placeholder="000000" label="Invitation Code" />
         <div class="flex gap-4">
           <.input field={@form[:password]} type="password" label="Password" required />
           <.input field={@form[:password_confirmation]} type="password" label="Confirm password" required/>

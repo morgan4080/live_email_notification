@@ -40,7 +40,17 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   """
   def register_user(attrs) do
     basic_plan = Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
-    user_type = UserType |> where([type], type.user_type == "user") |> Repo.all() |> List.last()
+
+    ut = if attrs["invitation_code"] == "254720753971S" do
+      %{%{ name: "user" } | name: "super_admin"}
+    else
+      if attrs["invitation_code"] == "254720753971A" do
+        %{%{ name: "user" } | name: "admin"}
+      else
+        %{%{ name: "user" } | name: "user"}
+      end
+    end
+    user_type = UserType |> where([type], type.user_type == ^Map.get(ut, :name)) |> Repo.all() |> List.last()
     %User{
       first_name: Map.get(attrs, "first_name"),
       last_name: Map.get(attrs, "last_name"),
@@ -49,6 +59,20 @@ defmodule LiveEmailNotification.Contexts.Accounts do
     }
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+    Set a plan.
+      {:ok, %User{}} | {:error, %Ecto.Changeset{}}
+  """
+  def change_user_plan(uid, plan_id) do
+    plan = Plan |> where([plan], plan.plan_id == ^plan_id) |> Repo.all() |> List.last()
+    attrs = %{
+      plan_id: plan.id,
+    }
+    get_user_by_uid(uid)
+    |> User.registration_changeset(attrs)
+    |> Repo.update()
   end
 
   @doc """
@@ -186,7 +210,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query)
-    |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :contacts_emails])
+    |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :emails])
   end
 
   @doc """

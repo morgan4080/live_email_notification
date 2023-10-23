@@ -78,6 +78,8 @@ defmodule LiveEmailNotificationWeb.Router do
 
     delete "/users/log_out", UserSessionController, :delete
 
+#    delete "/users/:uuid/permission/:codename", UserSessionController, :permission
+
     live_session :current_user,
                  on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_path},{LiveEmailNotificationWeb.UserAuth, :mount_current_user}],
                  root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
@@ -101,16 +103,6 @@ defmodule LiveEmailNotificationWeb.Router do
       live "/users/:uuid/contacts", UserLive, :admin
       live "/users/:uuid/groups", UserLive, :admin
       live "/users/:uuid/plan", UserLive, :super_admin
-#      live "/admin/roles", RoleLive, :index
-#      live "/admin/users", UserLive, :index
-#      live "/admin/contacts", ContactLive, :admin
-#      live "/admin/plans", PlanLive, :index
-#      live "/admin/emails", EmailLive, :admin
-#      live "/admin/groups", GroupLive, :admin
-#      live "/user/:uuid/plan", PlanLive, :user_plan
-#      live "/user/:uuid/emails", EmailLive, :user_emails
-#      live "/user/:uuid/contacts", ContactLive, :user_contacts
-#      live "/user/:uuid/groups", GroupLive, :user_groups
     end
   end
 

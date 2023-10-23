@@ -75,13 +75,13 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
               <div>
                 <dt class="sr-only">Title</dt>
-                <dd class="font-semibold text-slate-900 group-hover:text-white">Contacts Emails</dd>
+                <dd class="font-semibold text-slate-900 group-hover:text-white">Emails</dd>
               </div>
               <div>
                 <dt class="sr-only">Contacts Emails</dt>
                 <dd class="group-hover:text-blue-200 text-zinc-400">
-                  <%= if @current_user.contacts_emails do %>
-                    <span><%= length(@current_user.contacts_emails) %></span>
+                  <%= if @current_user.emails do %>
+                    <span><%= length(@current_user.emails) %></span>
                   <% end %>
                 </dd>
               </div>

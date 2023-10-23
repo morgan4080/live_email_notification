@@ -95,7 +95,7 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     user = user_token && Accounts.get_user_by_session_token(user_token)
     # Extend current user to include navigation
     # also check permissions apart from super admin
-    if user != nil && user.user_type == "super_admin" do
+    if user != nil && user.user_type.user_type == "super_admin" do
       user = Map.put_new(user, :navigation, Application.get_env(:live_email_notification, :admin_links))
       assign(conn, :current_user, user)
     else
