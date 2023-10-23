@@ -2,8 +2,106 @@ import Config
 
 # LOADED AT RUN-TIME
 
-config :live_email_notification, :app_name, "Mailot"
+config :live_email_notification, :app_name, "Mailer"
 config :live_email_notification, :version, "0.0.1"
+config :live_email_notification, :user_links, [
+  %{
+    name: "Dashboard",
+    path: "/dashboard",
+    nested: []
+  },
+  %{
+    name: "Contacts",
+    path: "/contacts",
+    nested: [
+      %{
+        name: "Contact Emails",
+        path: "/contacts/:contact_id/emails"
+      }
+    ]
+  },
+  %{
+    name: "Groups",
+    path: "/groups",
+    nested: [
+      %{
+        name: "Group Contacts",
+        path: "/groups/:group_id/contacts"
+      }
+    ]
+  }
+]
+
+config :live_email_notification, :admin_links, [
+  %{
+    name: "Dashboard",
+    path: "/dashboard",
+    nested: []
+  },
+  %{
+    name: "Contacts",
+    path: "/contacts",
+    nested: [
+      %{
+        name: "Contact Emails",
+        path: "/contacts/:contact_id/emails"
+      }
+    ]
+  },
+  %{
+    name: "Groups",
+    path: "/groups",
+    nested: [
+      %{
+        name: "Group Contacts",
+        path: "/groups/:group_id/contacts"
+      }
+    ]
+  },
+  %{
+    name: "Roles",
+    path: "/roles",
+    nested: [
+      %{
+        name: "Role Permissions",
+        path: "/roles/:id/permissions",
+        protected: false
+      },
+    ]
+  },
+  %{
+    name: "Permissions",
+    path: "/permissions",
+    nested: [
+    ]
+  },
+  %{
+    name: "Users",
+    path: "/users",
+    nested: [
+      %{
+        name: "User Dashboard",
+        path: "/users/:uuid/dashboard",
+        protected: false
+      },
+      %{
+        name: "User Contacts",
+        path: "/users/:uuid/contacts",
+        protected: false
+      },
+      %{
+        name: "User Groups",
+        path: "/users/:uuid/groups",
+        protected: false
+      },
+      %{
+        name: "User Plan",
+        path: "/users/:uuid/plan",
+        protected: true
+      }
+    ]
+  },
+]
 
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the

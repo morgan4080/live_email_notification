@@ -182,12 +182,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query)
-    |> Repo.preload(plan: :user)
-    |> Repo.preload(roles: :user)
-    |> Repo.preload(groups: :user)
-    |> Repo.preload(contacts: :user)
-    |> Repo.preload(emails: :user)
-    |> IO.inspect
+    |> Repo.preload([:plan, :roles, :groups, :contacts, :role_permissions, :contacts_emails])
   end
 
   @doc """

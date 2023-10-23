@@ -16,9 +16,10 @@ defmodule LiveEmailNotification.Db.User do
 
     belongs_to :plan, LiveEmailNotification.Db.Plan
     many_to_many :roles, LiveEmailNotification.Db.Role, join_through: "users_roles"
-    has_many :contacts, LiveEmailNotification.Db.Contact
+    has_many :role_permissions, through: [:roles, :permissions]
+    has_many :contacts, LiveEmailNotification.Db.Contact, on_delete: :delete_all, on_replace: :delete
+    has_many :contacts_emails, through: [:contacts, :emails]
     has_many :groups, LiveEmailNotification.Db.Group, on_delete: :delete_all, on_replace: :delete
-    has_many :emails, LiveEmailNotification.Db.Email, on_delete: :delete_all, on_replace: :delete
     timestamps(type: :utc_datetime)
   end
 

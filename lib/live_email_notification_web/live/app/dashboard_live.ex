@@ -61,7 +61,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
               <div>
                 <dt class="sr-only">Category</dt>
                 <dd class="group-hover:text-blue-200 text-zinc-400">
-                  <%= if @current_user.contacts do %>
+                  <%= if @current_user.groups do %>
                     <span><%= length(@current_user.groups) %></span>
                   <% end %>
                 </dd>
@@ -69,19 +69,19 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             </dl>
           </li>
           <li class="relative group cursor-pointer rounded-md p-3 bg-white ring-1 ring-slate-200 shadow-sm hover:bg-brand hover:ring-brand hover:shadow-md">
-            <.link href={~p"/emails"} class="absolute w-full h-full inset-0">
+            <.link href={~p"/contacts"} class="absolute w-full h-full inset-0">
 
             </.link>
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
               <div>
                 <dt class="sr-only">Title</dt>
-                <dd class="font-semibold text-slate-900 group-hover:text-white">Emails</dd>
+                <dd class="font-semibold text-slate-900 group-hover:text-white">Contacts Emails</dd>
               </div>
               <div>
-                <dt class="sr-only">Category</dt>
+                <dt class="sr-only">Contacts Emails</dt>
                 <dd class="group-hover:text-blue-200 text-zinc-400">
-                  <%= if @current_user.emails do %>
-                    <span><%= length(@current_user.groups) %></span>
+                  <%= if @current_user.contacts_emails do %>
+                    <span><%= length(@current_user.contacts_emails) %></span>
                   <% end %>
                 </dd>
               </div>

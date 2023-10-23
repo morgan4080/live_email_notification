@@ -5,7 +5,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateContact do
     create table(:contacts) do
       add :contact_name, :string
       add :contact_email, :string
-      add :user_id, references(:users)
+      add :user_id, references(:users), null: false
 
       timestamps(type: :utc_datetime)
     end

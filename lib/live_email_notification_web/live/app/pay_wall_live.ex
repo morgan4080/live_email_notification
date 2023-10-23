@@ -1,8 +1,6 @@
 defmodule LiveEmailNotificationWeb.PayWallLive do
   use LiveEmailNotificationWeb, :live_view
 
-#  alias LiveEmailNotification.Contexts.Accounts
-
   def render(assigns) do
     ~H"""
       <div class="mt-16 lg:mt-0 lg:flex lg:flex-row-reverse lg:items-center">

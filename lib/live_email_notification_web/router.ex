@@ -92,18 +92,25 @@ defmodule LiveEmailNotificationWeb.Router do
 
     live_session :require_authenticated_user_admin,
                  on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user},{LiveEmailNotificationWeb.UserAuth, :mount_current_path}],
-                 root_layout: {LiveEmailNotificationWeb.Layouts, :admin} do
-      live "/admin/dashboard", DashboardLive, :admin
-      live "/admin/roles", RoleLive, :index
-      live "/admin/users", UserLive, :index
-      live "/admin/contacts", ContactLive, :admin
-      live "/admin/plans", PlanLive, :index
-      live "/admin/emails", EmailLive, :admin
-      live "/admin/groups", GroupLive, :admin
-      live "/user/:uuid/plan", PlanLive, :user_plan
-      live "/user/:uuid/emails", EmailLive, :user_emails
-      live "/user/:uuid/contacts", ContactLive, :user_contacts
-      live "/user/:uuid/groups", GroupLive, :user_groups
+                 root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
+      live "/roles", RoleLive, :admin
+      live "/roles/:id/permissions", RoleLive, :admin
+      live "/permissions", PermissionLive, :admin
+      live "/users", UserLive, :admin
+      live "/users/:uuid/dashboard", UserLive, :admin
+      live "/users/:uuid/contacts", UserLive, :admin
+      live "/users/:uuid/groups", UserLive, :admin
+      live "/users/:uuid/plan", UserLive, :super_admin
+#      live "/admin/roles", RoleLive, :index
+#      live "/admin/users", UserLive, :index
+#      live "/admin/contacts", ContactLive, :admin
+#      live "/admin/plans", PlanLive, :index
+#      live "/admin/emails", EmailLive, :admin
+#      live "/admin/groups", GroupLive, :admin
+#      live "/user/:uuid/plan", PlanLive, :user_plan
+#      live "/user/:uuid/emails", EmailLive, :user_emails
+#      live "/user/:uuid/contacts", ContactLive, :user_contacts
+#      live "/user/:uuid/groups", GroupLive, :user_groups
     end
   end
 

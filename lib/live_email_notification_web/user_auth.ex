@@ -93,7 +93,19 @@ defmodule LiveEmailNotificationWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_session_token(user_token)
-    assign(conn, :current_user, user)
+    # Extend current user to include navigation
+    # also check permissions apart from super admin
+    if user != nil && user.is_super do
+      user = Map.put_new(user, :navigation, Application.get_env(:live_email_notification, :admin_links))
+      assign(conn, :current_user, user)
+    else
+      if user != nil do
+        user = Map.put_new(user, :navigation, Application.get_env(:live_email_notification, :user_links))
+        assign(conn, :current_user, user)
+      else
+        assign(conn, :current_user, user)
+      end
+    end
   end
 
   defp ensure_user_token(conn) do

@@ -4,9 +4,8 @@ defmodule LiveEmailNotification.Repo.Migrations.CreatePlan do
   def change do
     create table(:plans) do
       add :plan_name, :string
+      add :price, :float
       add :plan_description, :string
-
-      timestamps(type: :utc_datetime)
     end
   end
 end
