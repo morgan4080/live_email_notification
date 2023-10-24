@@ -5,7 +5,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateEmail do
     create table(:emails) do
       add :subject, :string
       add :content, :string
-      add :user_id, references(:users)
+      add :user_id, references(:users, on_delete: :delete_all), null: false
 
       timestamps(type: :utc_datetime)
     end

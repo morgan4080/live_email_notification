@@ -210,7 +210,6 @@ defmodule LiveEmailNotificationWeb.GroupLive do
   end
 
   def handle_event("create", %{"group" => group_params}, socket) do
-
     if user = socket.assigns.current_user do
       %{"group_name" => group_name, "group_description" => group_description} = group_params
       case  %Group{group_name: group_name, group_description: group_description, user_id: user.id}

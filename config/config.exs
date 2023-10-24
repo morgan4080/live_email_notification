@@ -24,6 +24,12 @@ config :live_email_notification, LiveEmailNotificationWeb.Endpoint,
   pubsub_server: LiveEmailNotification.PubSub,
   live_view: [signing_salt: "FuSl81+1"]
 
+#configures oban
+config :live_email_notification, Oban,
+       repo: LiveEmailNotification.Repo,
+       plugins: [Oban.Plugins.Pruner],
+       queues: [default: 10]
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails

@@ -52,6 +52,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
     end
     user_type = UserType |> where([type], type.user_type == ^Map.get(ut, :name)) |> Repo.all() |> List.last()
     %User{
+      uuid: Ecto.UUID.generate(),
       first_name: Map.get(attrs, "first_name"),
       last_name: Map.get(attrs, "last_name"),
       plan_id: basic_plan.id,

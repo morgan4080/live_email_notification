@@ -159,7 +159,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
     {:noreply, socket}
   end
 
-  def handle_event("view", %{ "selected" => uuid, "context" => context }, socket) do
+  def handle_event("view", %{ "selected" => uuid }, socket) do
     socket = socket
              |> redirect(to: ~p"/users/#{uuid}/dashboard")
     {:noreply, socket}

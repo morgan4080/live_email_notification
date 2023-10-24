@@ -31,7 +31,7 @@ defmodule LiveEmailNotification.Db.Contact do
     |> validate_email(opts)
     |> validate_name(opts)
     |> cast_assoc(:groups, with: &Group.group_changeset/2)
-    |> cast_assoc(:emails, with: &Email.email_changeset/2, drop_param: :emails_delete)
+    |> cast_assoc(:emails, with: &Email.email_changeset/2)
   end
 
   def changeset_update_groups(contact, groups) do

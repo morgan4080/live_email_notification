@@ -29,6 +29,20 @@ config :live_email_notification, :user_links, [
         path: "/groups/:group_id/contacts"
       }
     ]
+  },
+  %{
+    name: "Emails",
+    path: "/emails",
+    nested: [
+      %{
+        name: "Email Contacts",
+        path: "/emails/:email_id/contacts"
+      },
+      %{
+        name: "Email Groups",
+        path: "/emails/:email_id/groups"
+      }
+    ]
   }
 ]
 
@@ -55,6 +69,20 @@ config :live_email_notification, :admin_links, [
       %{
         name: "Group Contacts",
         path: "/groups/:group_id/contacts"
+      }
+    ]
+  },
+  %{
+  name: "Emails",
+  path: "/emails",
+    nested: [
+      %{
+         name: "Email Contacts",
+         path: "/emails/:email_id/contacts"
+       },
+      %{
+         name: "Email Groups",
+         path: "/emails/:email_id/groups"
       }
     ]
   },

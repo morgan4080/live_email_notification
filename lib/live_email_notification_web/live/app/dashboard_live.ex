@@ -124,7 +124,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <.link :if={@live_action == :index} href={~p"/emails"} class="absolute w-full h-full inset-0">
 
             </.link>
-            <.link :if={@live_action == :admin} href={~p"/users/#{@uuid}/emails"} class="absolute w-full h-full inset-0">
+            <.link :if={@live_action == :admin} href={~p"/users/" <> @uuid <> "/emails"} class="absolute w-full h-full inset-0">
 
             </.link>
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
@@ -147,7 +147,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
     """
   end
 
-  def mount(params, session, socket) do
+  def mount(params, _session, socket) do
     IO.inspect(params, label: "PARAMS") # %{"uuid" => "3ca78763-b7c8-4415-a3d0-3b71fa669ad6"}
     IO.inspect(socket.assigns.live_action, label: "LV") # socket.assigns.live_action: :admin
     if socket.assigns.live_action == :admin do

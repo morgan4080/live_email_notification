@@ -55,6 +55,8 @@ defmodule LiveEmailNotification.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
       {:elixir_uuid, "~> 1.2"},
+      {:timex, "~> 3.7.11"},
+      {:oban, "~> 2.16.2"},
       {:heroicons_liveview, "~> 0.3.0"}
     ]
   end

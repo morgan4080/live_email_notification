@@ -13,6 +13,9 @@ config :live_email_notification, LiveEmailNotification.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
+# prevent oban from running during tests
+config :live_email_notification, Oban, testing: :inline
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :live_email_notification, LiveEmailNotificationWeb.Endpoint,

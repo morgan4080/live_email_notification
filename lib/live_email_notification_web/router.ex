@@ -86,8 +86,11 @@ defmodule LiveEmailNotificationWeb.Router do
       live "/dashboard", DashboardLive, :index
       live "/groups", GroupLive, :index
       live "/contacts", ContactLive, :index
-      live "/contact/:id/emails", EmailLive, :index_contact
-      live "/group/:id/emails", EmailLive, :index_group
+      live "/emails", EmailLive, :index
+      live "/emails/:email_id/contacts", EmailLive, :emailcontacts
+      live "/emails/:email_id/groups", EmailLive, :emailgroups
+      live "/contact/:contact_id/emails", EmailLive, :contactemails
+      live "/group/:group_id/emails", EmailLive, :groupemails
       live "/plan", PayWallLive, :index
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
