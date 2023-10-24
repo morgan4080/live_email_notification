@@ -38,7 +38,6 @@ defmodule LiveEmailNotification.MixProject do
       {:phoenix, "~> 1.7.8"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.10"},
-      {:myxql, ">= 0.0.0"},
       {:phoenix_html, "~> 3.3"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20.1"},
@@ -57,7 +56,8 @@ defmodule LiveEmailNotification.MixProject do
       {:elixir_uuid, "~> 1.2"},
       {:timex, "~> 3.7.11"},
       {:oban, "~> 2.16.2"},
-      {:heroicons_liveview, "~> 0.3.0"}
+      {:heroicons_liveview, "~> 0.3.0"},
+      {:postgrex, "~> 0.17.3"}
     ]
   end
 

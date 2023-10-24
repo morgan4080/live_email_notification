@@ -166,6 +166,7 @@ defmodule LiveEmailNotificationWeb.EmailLive do
   end
 
   def handle_event("validate", %{"email" => email_params}, socket) do
+    IO.inspect(email_params, label: "ISBULK")
     if contact_ids = email_params["contacts"] do
       selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
       contacts = Repo.all(from c in Contact,
@@ -214,7 +215,7 @@ defmodule LiveEmailNotificationWeb.EmailLive do
           email_params
         )
 
-        {:noreply, assign_form(socket, Map.put(changeset, :action, :validate)) |> assign(bulk:  Enum.map([email_params["is_bulk"]], &Converter.convert!/1) |> List.last())}
+        {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
       end
     end
   end

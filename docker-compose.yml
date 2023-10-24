@@ -1,23 +1,18 @@
 version: '3.1'
 
 services:
-  mysql8:
-    container_name: mysql8
-    image: mysql:8.1.0
+  postgres:
+    container_name: postgresex
+    image: postgres:15.4-alpine3.17
     networks:
       - value8-network
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PW}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./mysql-conf/conf:/etc/mysql/conf.d
+      - "5432:5432"
     restart: always
-volumes:
-  mysql_data:
-    driver: local
 networks:
   value8-network:
     external: true

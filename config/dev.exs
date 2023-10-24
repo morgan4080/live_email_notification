@@ -2,12 +2,11 @@ import Config
 
 # Configure your database
 config :live_email_notification, LiveEmailNotification.Repo,
-  username: "root",
-  password: "root",
+   username: "postgres",
+   password: "postgres",
   hostname: "localhost",
   database: "live_email_notification_dev",
   stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
 # For development, we disable any cache and enable

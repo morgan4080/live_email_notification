@@ -68,6 +68,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mimerl" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/oban" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/parse_trans" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/postgrex" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ssl_verify_fun" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/timex" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/tzdata" />
