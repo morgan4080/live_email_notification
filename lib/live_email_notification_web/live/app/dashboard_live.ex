@@ -38,7 +38,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
           </ol>
         </nav>
         <header>
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-1 lg:px-8">
+            <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
               <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise">
                   <span :if={@live_action == :index}>
                     <.link href={~p"/users/settings"} class="text-brand">
@@ -155,7 +155,6 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
         socket =
           socket
              |> assign(
-                live_action: socket.assigns.live_action,
                 page_title: "Dashboard",
                 uuid: uuid,
                 selected_user: Accounts.get_user_by_uid(uuid) |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :emails]),

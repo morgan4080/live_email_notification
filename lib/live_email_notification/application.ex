@@ -27,7 +27,8 @@ defmodule LiveEmailNotification.Application do
       # Start a worker by calling: LiveEmailNotification.Worker.start_link(arg)
       # {LiveEmailNotification.Worker, arg},
       # Start to serve requests, typically the last entry
-      LiveEmailNotificationWeb.Endpoint
+      LiveEmailNotificationWeb.Endpoint,
+      {Oban, Application.fetch_env!(:live_email_notification, Oban)},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

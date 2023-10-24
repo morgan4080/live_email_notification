@@ -20,4 +20,10 @@ defmodule LiveEmailNotification.Db.Email do
     |> cast_assoc(:contacts, with: &Contact.user_contact_changeset/2)
     |> validate_required([:subject, :content])
   end
+
+  def changeset_update_contacts(email, contacts, changes) do
+    email
+    |> cast(changes, [:subject, :content])
+    |> put_assoc(:contacts, contacts)
+  end
 end

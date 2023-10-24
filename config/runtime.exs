@@ -38,10 +38,6 @@ config :live_email_notification, :user_links, [
         name: "Email Contacts",
         path: "/emails/:email_id/contacts"
       },
-      %{
-        name: "Email Groups",
-        path: "/emails/:email_id/groups"
-      }
     ]
   }
 ]
@@ -79,11 +75,7 @@ config :live_email_notification, :admin_links, [
       %{
          name: "Email Contacts",
          path: "/emails/:email_id/contacts"
-       },
-      %{
-         name: "Email Groups",
-         path: "/emails/:email_id/groups"
-      }
+       }
     ]
   },
 #  %{

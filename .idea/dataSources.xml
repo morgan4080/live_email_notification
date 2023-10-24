@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="live_email_notification_dev@localhost" uuid="500477af-7832-4fe6-b038-94f9269c6a17">
-      <driver-ref>mysql.8</driver-ref>
+    <data-source source="LOCAL" name="live_email_notification_dev@localhost" uuid="a6dff8c2-ef5c-4fda-92f4-ba8ca8185d53">
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/live_email_notification_dev</jdbc-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/live_email_notification_dev</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

@@ -46,7 +46,7 @@
                 <!-- Profile dropdown -->
                 <div class="relative ml-3">
                   <div class="flex space-x-4">
-                    <span class="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-thin text-gray-600 ring-1 ring-inset ring-gray-500/10"><%=@current_user.user_type.user_type%></span>
+                    <span class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-normal text-gray-600 ring-1 ring-inset ring-gray-500/10"><%=@current_user.user_type.user_type%></span>
                     <button phx-click={JS.toggle(to: "#account-menu")} type="button" class="relative inline-flex justify-center rounded-full text-sm font-semibold pl-3 bg-slate-900 text-white hover:bg-slate-700" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                       <span class="flex items-center text-xs">
                         <%=@current_user.email%>
@@ -134,7 +134,7 @@
 
     <main class="px-4 sm:px-6 lg:px-8">
         <.flash_group flash={@flash} />
-        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+        <div class="mx-auto py-6 sm:px-6 lg:px-8">
             <%= @inner_content %>
         </div>
     </main>

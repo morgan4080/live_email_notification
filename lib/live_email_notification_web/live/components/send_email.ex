@@ -23,10 +23,21 @@ defmodule LiveEmailNotificationWeb.SendEmail do
           <.error :if={@check_errors}>
             Oops, something went wrong! Please check the errors below.
           </.error>
+          <.error :if={@check_errors}>
+            Oops, something went wrong! Please check the errors below.
+          </.error>
           <.input field={@form[:id]} type="hidden" />
           <.input field={@form[:subject]} label="Subject" type="text" required />
           <.input field={@form[:content]} label="Content" type="textarea" required />
           <.input field={@form[:is_bulk]} label="Send bulk emails" type="checkbox" />
+          <span :if={length(@email_contacts) > 0} class="group items-center gap-2 rounded-full bg-white/25 px-3 py-2 text-xs text-slate-900 ring-1 ring-inset ring-black/[0.08] hover:bg-white/50 hover:ring-black/[0.13] flex mt-6">
+              <Heroicons.Outline.information_circle class="h-4 w-4 text-brand" />
+              <span class="font-medium">
+                <span>Highlighted contacts were sent this email on <%= @selected_email.inserted_at %>.
+                  <button phx-click={@callbackstatus} class="border-b border-brand">Check statuses</button>
+                </span>
+              </span>
+          </span>
           <.input
             :if={!@bulk}
             field={@form[:contacts]}

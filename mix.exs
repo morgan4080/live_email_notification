@@ -56,7 +56,7 @@ defmodule LiveEmailNotification.MixProject do
       {:elixir_uuid, "~> 1.2"},
       {:timex, "~> 3.7.11"},
       {:oban, "~> 2.16.2"},
-      {:heroicons_liveview, "~> 0.3.0"},
+      {:heroicons_liveview, "~> 0.5.0"},
       {:postgrex, "~> 0.17.3"}
     ]
   end

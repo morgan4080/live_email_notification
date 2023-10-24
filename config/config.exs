@@ -28,7 +28,13 @@ config :live_email_notification, LiveEmailNotificationWeb.Endpoint,
 config :live_email_notification, Oban,
        repo: LiveEmailNotification.Repo,
        plugins: [Oban.Plugins.Pruner],
-       queues: [default: 10]
+       queues: [
+         default: 10,
+         mailers: [
+           limit: 10
+           # paused: true # queue will now start in a paused state, which means it won't process anything  Oban.resume_queue/2
+         ]
+       ]
 
 # Configures the mailer
 #

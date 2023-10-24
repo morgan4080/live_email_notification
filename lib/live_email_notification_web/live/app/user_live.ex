@@ -9,7 +9,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
 
   def render(assigns) do
     ~H"""
-      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-1 lg:px-8">
+      <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
         <div>
           <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise relative">
             <.link href={~p"/users/settings"} class="text-brand"><%= @current_user.first_name <> "'s" %></.link> <%= String.split(@current_path, "/") %>
