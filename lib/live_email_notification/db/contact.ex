@@ -1,7 +1,7 @@
 defmodule LiveEmailNotification.Db.Contact do
   use Ecto.Schema
   import Ecto.Changeset
-  alias LiveEmailNotification.Db.{User, Group, Email}
+  alias LiveEmailNotification.Db.{User, Group, Email, ContactEmail}
 
   schema "contacts"  do
     field :contact_name, :string
@@ -10,6 +10,7 @@ defmodule LiveEmailNotification.Db.Contact do
     belongs_to :user, User
     many_to_many :groups, Group, join_through: "group_contact", on_delete: :delete_all, on_replace: :delete
     many_to_many :emails, Email, join_through: "contacts_emails", on_delete: :delete_all, on_replace: :delete
+    has_many :contacts_emails, ContactEmail
     timestamps(type: :utc_datetime)
   end
 

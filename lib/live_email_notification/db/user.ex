@@ -11,9 +11,9 @@ defmodule LiveEmailNotification.Db.User do
     field :email, :string
     field :msisdn, :string
     field :password, :string, virtual: true, redact: true
-    field :password_confirmation, :string, virtual: true
-    field :hashed_password, :string
-    field :confirmed_at, :string
+    field :password_confirmation, :string, virtual: true, redact: true
+    field :hashed_password, :string, redact: true
+    field :confirmed_at, :naive_datetime
     field :invitation_code, :string, virtual: true
 
     belongs_to :plan, LiveEmailNotification.Db.Plan

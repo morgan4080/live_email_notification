@@ -3,5 +3,4 @@ defmodule LiveEmailNotificationWeb.ViewHelper do
 
   use LiveEmailNotificationWeb, :verified_routes
 
-
 end

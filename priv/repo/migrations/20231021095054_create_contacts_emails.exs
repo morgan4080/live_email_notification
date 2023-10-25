@@ -5,7 +5,7 @@ defmodule LiveEmailNotification.Repo.Migrations.CreateContactsEmails do
     create table(:contacts_emails) do
       add :contact_id, references(:contacts, on_delete: :delete_all)
       add :email_id, references(:emails, on_delete: :delete_all)
-      add :is_email_sent, :string, null: false, default: false
+      add :is_email_sent, :boolean, null: false, default: false
     end
 
     create(index(:contacts_emails, [:contact_id]))

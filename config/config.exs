@@ -32,7 +32,6 @@ config :live_email_notification, Oban,
          default: 10,
          mailers: [
            limit: 10
-           # paused: true # queue will now start in a paused state, which means it won't process anything  Oban.resume_queue/2
          ]
        ]
 
