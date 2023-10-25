@@ -20,7 +20,7 @@ defmodule LiveEmailNotification.Contexts.Emails do
     case update do
       {:ok, email_struct} ->
         # if no contacts no jobs start
-        result = Enum.map(contacts, fn contact ->
+        Enum.map(contacts, fn contact ->
           %{
             "email_id" => email.id,
             "contact_id" => contact.id,

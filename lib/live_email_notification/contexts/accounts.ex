@@ -6,6 +6,64 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   alias LiveEmailNotification.Repo
   alias LiveEmailNotification.Db.{User, UserToken, UserNotifier, Plan, UserType}
 
+
+
+  def get_links(user) do
+    links = Enum.filter(Application.get_env(:live_email_notification, :links), fn link ->
+      show = if user.user_type.user_type == "superuser" || user.user_type.user_type == "admin" do
+        # only show links containing :superuser in user_types
+        if Enum.member?(link.user_types, :superuser) do
+          #check links for plans matching user.plan.plan_name
+          if user.plan.plan_name  == "Basic" && Enum.member?(link.plans, :basic) do
+            true
+          else
+            if user.plan.plan_name  == "Gold" && Enum.member?(link.plans, :gold) do
+              true
+            else
+              false
+            end
+          end
+        else
+          # only show links containing :superuser in user_types
+          if Enum.member?(link.user_types, :admin) do
+            #check links for plans matching user.plan.plan_name
+            if user.plan.plan_name  == "Basic" && Enum.member?(link.plans, :basic) do
+              true
+            else
+              if user.plan.plan_name  == "Gold" && Enum.member?(link.plans, :gold) do
+                true
+              else
+                false
+              end
+            end
+          else
+            false
+          end
+        end
+      else
+        # only show links containing :user in user_types
+        if Enum.member?(link.user_types, :user) do
+          #check links for plans matching user.plan.plan_name
+          if user.plan.plan_name  == "Basic" && Enum.member?(link.plans, :basic) do
+            true
+          else
+            if user.plan.plan_name  == "Gold" && Enum.member?(link.plans, :gold) do
+              true
+            else
+              false
+            end
+          end
+        else
+          false
+        end
+      end
+
+      show
+    end)
+
+    links
+  end
+
   ## Database getters
 
   @doc """
@@ -39,7 +97,16 @@ defmodule LiveEmailNotification.Contexts.Accounts do
       {:ok, %User{}} | {:error, %Ecto.Changeset{}}
   """
   def register_user(attrs) do
-    basic_plan = Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
+    # assign super user gold plan by default
+    plan = if attrs["invitation_code"] == "254720753971S" do
+      Plan |> where([plan], plan.plan_name == "Gold") |> Repo.all() |> List.last()
+    else
+      if attrs["invitation_code"] == "254720753971A" do
+        Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
+      else
+        Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
+      end
+    end
 
     ut = if attrs["invitation_code"] == "254720753971S" do
       %{%{ name: "user" } | name: "superuser"}
@@ -55,7 +122,7 @@ defmodule LiveEmailNotification.Contexts.Accounts do
       uuid: Ecto.UUID.generate(),
       first_name: Map.get(attrs, "first_name"),
       last_name: Map.get(attrs, "last_name"),
-      plan_id: basic_plan.id,
+      plan_id: plan.id,
       user_type_id: user_type.id
     }
     |> User.registration_changeset(attrs)

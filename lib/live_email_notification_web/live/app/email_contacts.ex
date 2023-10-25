@@ -3,8 +3,8 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
 
   import Ecto.Query
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{Email, ContactEmail, Contact, Accounts}
-  alias LiveEmailNotification.Contexts.{ContactsEmails, Emails}
+  alias LiveEmailNotification.Db.{Email, ContactEmail, Contact}
+  alias LiveEmailNotification.Contexts.{ContactsEmails, Emails, Accounts}
   alias LiveEmailNotification.Helpers.Converter
 
   def render(assigns) do
@@ -42,15 +42,21 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
         </nav>
         <header>
             <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
-              <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise">
+              <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise relative">
                   Email & Recipients
+                  <button phx-click={JS.push("showReaction", value: %{"context" => "resend", "ce" => nil, "selected" => nil})} type="button" class="absolute right-0 inline-flex justify-center rounded-full text-sm font-semibold p-2 px-3 bg-slate-900 text-white hover:bg-slate-700">
+                    <span class="flex items-center text-xs">
+                        Send email
+                      <span class="ml-1" aria-hidden="true"><Heroicons.Solid.plus class="h-2.5 w-2.5" /></span>
+                    </span>
+                  </button>
               </h1>
               <p class="mt-2 text-lg text-slate-700 dark:text-slate-400"><%=@email.subject%></p>
               <p class="text-sm text-slate-500 line-clamp-3 hover:text-slate-600">Content: <%=@email.content%></p>
             </div>
         </header>
         <div class="mx-auto px-4 sm:px-6 space-y-1 lg:px-8">
-           <.table id="email-contacts" rows={@email.contacts} callback={JS.push("showReaction", value: %{"context" => "add"})}>
+           <.table id="email-contacts" rows={@email.contacts} callback={JS.push("showReaction", value: %{"context" => "resend", "ce" => nil, "selected" => nil})}>
               <:col :let={contact} label="Contact name"><%= contact.contact_name %></:col>
               <:col :let={contact} label="Contact email"><%= contact.contact_email %></:col>
               <:col :let={contact} label="Status">
@@ -161,13 +167,25 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
       "resend" ->
         # start modal with the contact to resend to selected
         # update callback above with the functionality
+        email_contacts = if !is_nil(contact_id) do
+          Enum.filter(socket.assigns.email_contacts, fn(c) -> c == Converter.convert!(contact_id) end)
+        else
+          []
+        end
+
+        selected_email_group_contacts = if !is_nil(contact_id) do
+          [Repo.get_by(Contact, id: contact_id)]
+        else
+          []
+        end
+
         {
           :noreply,
           socket
              |> assign(:modal_active, !socket.assigns.modal_active)
              |> assign(:modal_context, context)
-             |> assign(:email_contacts, Enum.filter(socket.assigns.email_contacts, fn(c) -> c == Converter.convert!(contact_id) end)) # only selected contact_id
-             |> assign(:selected_email_group_contacts, [Repo.get_by(Contact, id: contact_id)])
+             |> assign(:email_contacts, email_contacts) # only selected contact_id
+             |> assign(:selected_email_group_contacts, selected_email_group_contacts)
         }
       "remove" ->
         case ContactsEmails.remove_contact_email(contacts_emails_id) do
@@ -176,7 +194,7 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
             {:noreply, socket}
           _ ->
             socket = socket |> put_flash(:error, "Could not remove contact from email")
-            {:noreply, }
+            {:noreply, socket}
         end
     end
   end

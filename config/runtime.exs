@@ -4,15 +4,19 @@ import Config
 
 config :live_email_notification, :app_name, "Mailer"
 config :live_email_notification, :version, "0.0.1"
-config :live_email_notification, :user_links, [
+config :live_email_notification, :links, [
   %{
     name: "Dashboard",
     path: "/dashboard",
+    plans: [:basic, :gold],
+    user_types: [:user, :admin, :superuser],
     nested: []
   },
   %{
     name: "Contacts",
     path: "/contacts",
+    plans: [:basic, :gold],
+    user_types: [:user, :admin, :superuser],
     nested: [
       %{
         name: "Contact Emails",
@@ -23,6 +27,8 @@ config :live_email_notification, :user_links, [
   %{
     name: "Groups",
     path: "/groups",
+    plans: [:gold],
+    user_types: [:user, :admin, :superuser],
     nested: [
       %{
         name: "Group Contacts",
@@ -33,90 +39,39 @@ config :live_email_notification, :user_links, [
   %{
     name: "Emails",
     path: "/emails",
+    plans: [:basic, :gold],
+    user_types: [:user, :admin, :superuser],
     nested: [
       %{
         name: "Email Contacts",
         path: "/emails/:email_id/contacts"
       },
     ]
-  }
-]
-
-config :live_email_notification, :admin_links, [
-  %{
-    name: "Dashboard",
-    path: "/dashboard",
-    nested: []
   },
-  %{
-    name: "Contacts",
-    path: "/contacts",
-    nested: [
-      %{
-        name: "Contact Emails",
-        path: "/contacts/:contact_id/emails"
-      }
-    ]
-  },
-  %{
-    name: "Groups",
-    path: "/groups",
-    nested: [
-      %{
-        name: "Group Contacts",
-        path: "/groups/:group_id/contacts"
-      }
-    ]
-  },
-  %{
-  name: "Emails",
-  path: "/emails",
-    nested: [
-      %{
-         name: "Email Contacts",
-         path: "/emails/:email_id/contacts"
-       }
-    ]
-  },
-#  %{
-#    name: "Roles",
-#    path: "/roles",
-#    nested: [
-#      %{
-#        name: "Role Permissions",
-#        path: "/roles/:id/permissions",
-#        protected: false
-#      },
-#    ]
-#  },
-#  %{
-#    name: "Permissions",
-#    path: "/permissions",
-#    nested: [
-#    ]
-#  },
   %{
     name: "Users",
-    path: "/users",
+    path: "/admin/users",
+    plans: [:basic, :gold],
+    user_types: [:admin, :superuser],
     nested: [
       %{
         name: "User Dashboard",
-        path: "/users/:uuid/dashboard",
+        path: "/admin/users/:uuid/dashboard",
         protected: false
       },
       %{
         name: "User Contacts",
-        path: "/users/:uuid/contacts",
+        path: "/admin/users/:uuid/contacts",
         protected: false
       },
       %{
         name: "User Groups",
-        path: "/users/:uuid/groups",
+        path: "/admin/users/:uuid/groups",
         protected: false
       },
       %{
         name: "User Plan",
-        path: "/users/:uuid/plan",
+        path: "/admin/users/:uuid/plan",
         protected: true
       }
     ]

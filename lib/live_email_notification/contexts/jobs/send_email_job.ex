@@ -24,14 +24,12 @@ defmodule LiveEmailNotification.Contexts.Jobs.SendEmailJob do
         |> subject(subject)
         |> text_body(content)
 
-      IO.inspect(email, label: "OBAN EMAIL")
-
       case Mailer.deliver(email) do
         # update status of contacts_emails column is_email_sent to true
         {:ok, _metadata} ->
           ContactsEmails.update_contact_email(%{"contact_id" => contact_id, "email_id" => email_id, "is_email_sent" => true})
           {:ok, email}
-        {:error, error} ->
+        {:error, _error} ->
           # add failure reason
           ContactsEmails.update_contact_email(%{"contact_id" => contact_id, "email_id" => email_id, "is_email_sent" => true})
           {:ok, email}

@@ -78,36 +78,54 @@ defmodule LiveEmailNotificationWeb.Router do
 
     delete "/users/log_out", UserSessionController, :delete
 
-#    delete "/users/:uuid/permission/:codename", UserSessionController, :permission
-
-    live_session :current_user,
+    live_session :authenticated_user,
                  on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_path},{LiveEmailNotificationWeb.UserAuth, :mount_current_user}],
                  root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
       live "/dashboard", DashboardLive, :index
-      live "/groups", GroupLive, :index
       live "/contacts", ContactLive, :index
       live "/emails", EmailLive, :index
       live "/emails/:email_id/contacts", EmailContactsLive, :emailcontacts
       live "/contact/:contact_id/emails", EmailLive, :contactemails
-      live "/group/:group_id/emails", EmailLive, :groupemails
       live "/plan", PayWallLive, :index
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
+  end
 
-    live_session :require_authenticated_user_admin,
+
+  scope "/", LiveEmailNotificationWeb do
+    pipe_through [:browser, :require_authenticated_user_gold]
+
+    live_session :authenticated_user_gold,
+                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_path},{LiveEmailNotificationWeb.UserAuth, :mount_current_user}],
+                 root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
+      live "/groups", GroupLive, :index
+      live "/group/:group_id/emails", EmailLive, :groupemails
+    end
+  end
+
+  scope "/", LiveEmailNotificationWeb do
+    pipe_through [:browser, :require_authenticated_user_admin]
+
+    live_session :authenticated_user_admin,
                  on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user},{LiveEmailNotificationWeb.UserAuth, :mount_current_path}],
                  root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
-#      live "/roles", RoleLive, :admin
-#      live "/roles/:id/permissions", RoleLive, :admin
-#      live "/permissions", PermissionLive, :admin
-      live "/users", UserLive, :admin
-      live "/users/:uuid/dashboard", DashboardLive, :admin
-      live "/users/:uuid/contacts", ContactLive, :admin
-      live "/users/:uuid/groups", GroupLive, :admin
-      live "/users/:uuid/plan", PayWallLive, :admin
-      live "/users/:uuid/contact/:id/emails", EmailLive, :admin_contact
-      live "/users/:uuid/group/:id/emails", EmailLive, :admin_group
+      live "/admin/users", UserLive, :admin
+      live "/admin/users/:uuid/dashboard", DashboardLive, :admin
+      live "/admin/users/:uuid/contacts", ContactLive, :admin
+      live "/admin/users/:uuid/plan", PayWallLive, :admin
+      live "/admin/users/:uuid/contact/:id/emails", EmailLive, :admin_contact
+    end
+  end
+
+  scope "/", LiveEmailNotificationWeb do
+    pipe_through [:browser, :require_authenticated_user_admin_gold]
+
+    live_session :authenticated_user_admin_gold,
+                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user},{LiveEmailNotificationWeb.UserAuth, :mount_current_path}],
+                 root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
+      live "/admin/users/:uuid/groups", GroupLive, :admin
+      live "/admin/users/:uuid/group/:id/emails", EmailLive, :admin_group
     end
   end
 

@@ -1,10 +1,8 @@
 defmodule LiveEmailNotificationWeb.EmailLive do
   use LiveEmailNotificationWeb, :live_view
 
-  import Ecto.Query
-
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{Contact, Email, Group}
+  alias LiveEmailNotification.Db.Email
   alias LiveEmailNotification.Contexts.{Accounts, Emails}
 
   def render(assigns) do

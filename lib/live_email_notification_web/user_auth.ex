@@ -93,18 +93,10 @@ defmodule LiveEmailNotificationWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_session_token(user_token)
-    # Extend current user to include navigation
-    # also check permissions apart from super admin
-    if user != nil && user.user_type.user_type == "superuser" do
-      user = Map.put_new(user, :navigation, Application.get_env(:live_email_notification, :admin_links))
-      assign(conn, :current_user, user)
+    if user != nil do
+      assign(conn, :current_user, Map.put_new(user, :navigation, Accounts.get_links(user)))
     else
-      if user != nil do
-        user = Map.put_new(user, :navigation, Application.get_env(:live_email_notification, :user_links))
-        assign(conn, :current_user, user)
-      else
-        assign(conn, :current_user, user)
-      end
+      assign(conn, :current_user, user)
     end
   end
 
@@ -233,18 +225,75 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     end
   end
 
+  def require_authenticated_user_gold(conn, opts) do
+    # check plan for gold throw out anyone else
+    if plan_name =  conn.assigns[:current_user].plan.plan_name do
+      if plan_name == "Gold" do
+        require_authenticated_user(conn, opts)
+      else
+        conn
+        |> put_flash(:error, "You have to be a gold member to use groups.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/dashboard")
+        |> halt()
+      end
+    else
+      conn
+      |> put_flash(:error, "Login to use.")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/users/log_in")
+      |> halt()
+    end
+  end
+
   @doc """
   Used for routes that require the user to be an admin.
 
   Check permissions can_view_user, can_view_permissions, can_view_plans, can_view_groups, can_view_contacts, can_view_emails
   """
   def require_authenticated_user_admin(conn, _opts) do
-
-    if conn.assigns[:current_user] do
-      conn
+    if Map.has_key?(conn.assigns, :current_user) do
+      if user_type =  conn.assigns[:current_user].user_type.user_type do
+        if user_type == "admin" || user_type == "superuser" do
+          conn
+        else
+          conn
+          |> put_flash(:error, "You are not allowed to view this page.")
+          |> maybe_store_return_to()
+          |> redirect(to: ~p"/dashboard")
+          |> halt()
+        end
+      else
+        conn
+        |> put_flash(:error, "You are not allowed to view this page.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/dashboard")
+        |> halt()
+      end
     else
       conn
-      |> put_flash(:error, "You are not allowed to view this page.")
+      |> put_flash(:error, "Login to use.")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/users/log_in")
+      |> halt()
+    end
+  end
+
+  def require_authenticated_user_admin_gold(conn, opts) do
+    # check plan for gold throw out anyone else
+    if plan_name =  conn.assigns[:current_user].plan.plan_name do
+      if plan_name == "Gold" do
+        require_authenticated_user_admin(conn, opts)
+      else
+        conn
+        |> put_flash(:error, "You have to be a gold member to use groups.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/dashboard")
+        |> halt()
+      end
+    else
+      conn
+      |> put_flash(:error, "Login to use.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()

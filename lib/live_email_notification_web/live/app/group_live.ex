@@ -3,22 +3,26 @@ defmodule LiveEmailNotificationWeb.GroupLive do
   import Ecto.Query
   alias LiveEmailNotification.Repo
   alias LiveEmailNotification.Db.{Group, Contact}
+  alias LiveEmailNotification.Contexts.Accounts
 
   def render(assigns) do
     ~H"""
       <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
         <div>
           <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise relative">
-            <.link href={~p"/users/settings"} class="text-brand"><%= @current_user.first_name <> "'s" %></.link> <%= String.split(@current_path, "/") %>
+            <.link href={~p"/users/settings"} class="text-brand"><%= @user.first_name <> "'s" %></.link> <%= String.split(@current_path, "/") %>
             <button phx-click="showAddGroup" phx-value-context="add" type="button" class="absolute right-0 inline-flex justify-center rounded-full text-sm font-semibold p-2 px-3 bg-slate-900 text-white hover:bg-slate-700">
               <span class="flex items-center text-xs">Add <span class="ml-1" aria-hidden="true"><Heroicons.Solid.plus class="h-2.5 w-2.5" /></span></span>
             </button>
           </h1>
           <p class="text-sm text-slate-500 hover:text-slate-600">View and add groups to your account.</p>
         </div>
-        <.table id="groups" rows={@current_user.groups} callback={JS.push("showAddGroup", value: %{"context" => "add"})}>
+        <.table id="groups" rows={@groups} callback={JS.push("showAddGroup", value: %{"context" => "add"})}>
           <:col :let={group} label="Group Name"><%= group.group_name %></:col>
           <:col :let={group} label="Group Description"><%= group.group_description %></:col>
+          <:col :let={group} label="Contacts Count">
+            <%= group.group_description %>
+          </:col>
           <:col :let={group} label="Actions">
             <span class="space-x-1">
               <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
@@ -63,7 +67,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
             module={LiveEmailNotificationWeb.CreateGroup}
             id="create_group"
             form={@form}
-            current_user={@current_user}
+            current_user={@user}
             trigger_submit={@trigger_submit}
             check_errors={@check_errors}
           />
@@ -74,7 +78,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
             title="Add Group to Contacts"
             contact={@selected_group}
             form={@form}
-            current_user={@current_user}
+            current_user={@user}
             trigger_submit={@trigger_submit}
             group_contacts={@group_contacts}
             selected_group={@selected_group}
@@ -86,7 +90,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
             module={LiveEmailNotificationWeb.UpdateGroup}
             id="update_group"
             form={@form}
-            current_user={@current_user}
+            current_user={@user}
             trigger_submit={@trigger_submit}
             check_errors={@check_errors}
           />
@@ -152,10 +156,27 @@ defmodule LiveEmailNotificationWeb.GroupLive do
            custom_error: nil,
            selected_group: nil,
            group_contacts: [],
-           page_title: "Groups"
+           page_title: "Groups",
+           user: socket.assigns.current_user,
+           groups: socket.assigns.current_user.groups # TODO UUID
          )
       |> assign_form(Group.group_changeset(%Group{}, %{}))
-    {:ok, socket}
+
+      if socket.assigns.live_action == :admin && Map.has_key?(params, "uuid") do
+        %{"uuid" => uuid} = params
+        user = Accounts.get_user_by_uid(uuid) |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :emails])
+        socket =
+          socket
+          |> assign(
+               page_title: "Dashboard",
+               uuid: uuid,
+               user: user,
+               groups: user.groups
+             )
+        {:ok, socket}
+      else
+        {:ok, socket}
+      end
   end
 
   def handle_event("showAddGroup", %{ "context" => context }, socket) do
@@ -210,7 +231,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
   end
 
   def handle_event("create", %{"group" => group_params}, socket) do
-    if user = socket.assigns.current_user do
+    if user = socket.assigns.user do
       %{"group_name" => group_name, "group_description" => group_description} = group_params
       case  %Group{group_name: group_name, group_description: group_description, user_id: user.id}
             |> Group.group_changeset(group_params)

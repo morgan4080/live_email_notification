@@ -19,7 +19,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <li>
               <div class="flex justify-center">
                 <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
-                <.link href={~p"/users"} class="text-xs">
+                <.link href={~p"/admin/users"} class="text-xs">
                    users
                 </.link>
               </div>
@@ -27,7 +27,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <li>
               <div class="flex justify-center">
                 <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
-                <.link href={~p"/users/#{@uuid}/dashboard"} class={[
+                <.link href={"/admin/users/#{@uuid}/dashboard"} class={[
                   "text-xs",
                   @selected_path == "/dashboard" && "border-b border-brand !text-brand"
                 ]}>
@@ -62,7 +62,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <.link :if={@live_action == :index} href={~p"/plan"} class="absolute w-full h-full inset-0">
 
             </.link>
-            <.link :if={@live_action == :admin} href={~p"/users/#{@uuid}/plan"} class="absolute w-full h-full inset-0">
+            <.link :if={@live_action == :admin} href={"/admin/users/#{@uuid}/plan"} class="absolute w-full h-full inset-0">
 
             </.link>
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
@@ -80,7 +80,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <.link :if={@live_action == :index} href={~p"/contacts"} class="absolute w-full h-full inset-0">
 
             </.link>
-            <.link :if={@live_action == :admin} href={~p"/users/#{@uuid}/contacts"} class="absolute w-full h-full inset-0">
+            <.link :if={@live_action == :admin} href={"/admin/users/#{@uuid}/contacts"} class="absolute w-full h-full inset-0">
 
             </.link>
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
@@ -102,7 +102,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <.link :if={@live_action == :index} href={~p"/groups"} class="absolute w-full h-full inset-0">
 
             </.link>
-            <.link :if={@live_action == :admin} href={~p"/users/#{@uuid}/groups"} class="absolute w-full h-full inset-0">
+            <.link :if={@live_action == :admin} href={"/admin/users/#{@uuid}/groups"} class="absolute w-full h-full inset-0">
 
             </.link>
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
@@ -124,7 +124,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
             <.link :if={@live_action == :index} href={~p"/emails"} class="absolute w-full h-full inset-0">
 
             </.link>
-            <.link :if={@live_action == :admin} href={~p"/users/" <> @uuid <> "/emails"} class="absolute w-full h-full inset-0">
+            <.link :if={@live_action == :admin} href={~p"/admin/users/" <> @uuid <> "/emails"} class="absolute w-full h-full inset-0">
 
             </.link>
             <dl class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center">
