@@ -5,13 +5,7 @@
 To run database
 
   * Run `docker network create value8-network`
-  * Run `docker volume create mysql_data`
-  * Run `docker-compose up -d` to start mysql
-  * Run `docker exec -it mysql8 mysql -uroot -p` to login
-  * Run `UPDATE mysql.user SET host='%' WHERE user='root' AND host='localhost';`
-  * Run `FLUSH PRIVILEGES;`
-  * Run `exit;`
-  * Run `docker restart mysql8`
+  * Run `docker-compose up -d`
 
 To start your Phoenix server:
 
