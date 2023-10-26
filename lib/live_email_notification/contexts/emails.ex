@@ -160,20 +160,15 @@ defmodule LiveEmailNotification.Contexts.Emails do
     end
   end
 
-  def send_and_update_email(email_params, selected_email_group_contacts, live_action, selected_user_id, current_user_id) do
+  def send_and_update_email(email_params, selected_email_group_contacts, live_action, selected_user_id) do
     if Map.has_key?(email_params, "contacts") do
       contact_ids = email_params["contacts"]
 
       selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
 
       %{"content" => content, "id" => email_id, "subject" => subject, "contacts" => contacts} = %{email_params | "contacts" => selected_contacts_ints}
-      email_changes = if live_action == :admin do
-        # selected_user user exists through uuid TODO UUID
-        # when live_action == :admin
-        Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, selected_user_id)
-      else
-        Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, current_user_id)
-      end
+
+      email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, selected_user_id)
 
       email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts])
 
@@ -204,13 +199,7 @@ defmodule LiveEmailNotification.Contexts.Emails do
               Map.put_new(email_params, "contacts", Enum.uniq(contacts_lists))
             end
 
-        email_changes = if live_action == :admin do
-          # selected_user user exists through uuid TODO UUID
-          # live_action == :admin
-          Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, selected_user_id)
-        else
-          Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, current_user_id)
-        end
+        email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, selected_user_id)
 
         email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts])
 
@@ -219,13 +208,7 @@ defmodule LiveEmailNotification.Contexts.Emails do
 
         %{ "id" => email_id, "content" => content, "subject" => subject } = email_params
 
-        email_changes = if live_action == :admin do
-          # selected_user user exists through uuid
-          # when socket.assigns.live_action == :admin
-          Map.put_new(%Email{subject: subject, content: content, contacts: []}, :user_id, selected_user_id)
-        else
-          Map.put_new(%Email{subject: subject, content: content, contacts: []}, :user_id, current_user_id)
-        end
+        email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: []}, :user_id, selected_user_id)
 
         email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts])
 

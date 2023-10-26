@@ -10,7 +10,50 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
   def render(assigns) do
     ~H"""
       <div>
-        <nav class="flex px-6" aria-label="Breadcrumb">
+        <nav :if={@live_action == :admin} class="flex px-4 sm:px-6 lg:px-8" aria-label="Breadcrumb">
+          <ol role="list" class="flex justify-center">
+            <li>
+              <div>
+                <.link href={~p"/dashboard"}>
+                  <Heroicons.Solid.home class="text-gray-500 h-4 w-4" />
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <.link href={~p"/admin/users"} class="text-xs">
+                   users
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <.link href={"/admin/users/#{@uuid}/dashboard"} class="text-xs">
+                   dashboard
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <.link href={"/admin/users/#{@uuid}/emails"} class="text-xs">
+                   emails: <%=@user.email%>
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <span class="border-b border-brand !text-brand text-xs">
+                  email: <%=@email.id%>
+                </span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <nav :if={@live_action == :index} class="flex px-4 sm:px-6 lg:px-8" aria-label="Breadcrumb">
           <ol role="list" class="flex justify-center">
             <li>
               <div>
@@ -43,7 +86,7 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
         <header>
             <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
               <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise relative">
-                  Email & Recipients
+                  Email & Contacts
                   <button phx-click={JS.push("showReaction", value: %{"context" => "resend", "ce" => nil, "selected" => nil})} type="button" class="absolute right-0 inline-flex justify-center rounded-full text-sm font-semibold p-2 px-3 bg-slate-900 text-white hover:bg-slate-700">
                     <span class="flex items-center text-xs">
                         Send email
@@ -101,7 +144,7 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
               title="Resend email to contact"
               email={@email}
               form={@form}
-              current_user={@current_user}
+              current_user={@user}
               bulk={@bulk}
               trigger_submit={@trigger_submit}
               email_contacts={@email_contacts}
@@ -129,23 +172,22 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
   end
 
   def mount(params, _session, socket) do
-    # fetch email in question
-    # add email to assigns
-    # preload contacts for the said email along with their statuses
     %{"email_id" => email_id} = params
     email = Emails.get_email_by_id(email_id)
     email = email |> Repo.preload([contacts: [contacts_emails: from(ce in ContactEmail, where: ce.email_id == ^email.id)]])
-    socket = socket |> assign(
-                  email: email,
-                  modal_active: false,
-                  modal_context: false,
-                  bulk: false,
-                  trigger_submit: false,
-                  check_errors: nil,
-                  selected_user: nil,
-                  email_contacts: email.contacts |> Enum.map(&(&1.id)),
-                  selected_email_group_contacts: []
-                ) |> assign_form(Email.email_changeset(email, %{}))
+    socket = socket
+       |> assign(
+          email: email,
+          modal_active: false,
+          modal_context: false,
+          bulk: false,
+          trigger_submit: false,
+          check_errors: nil,
+          selected_user: nil,
+          email_contacts: email.contacts |> Enum.map(&(&1.id)),
+          selected_email_group_contacts: [],
+          user: if (socket.assigns.live_action == :admin) do socket.assigns.selected_user else socket.assigns.current_user end
+        ) |> assign_form(Email.email_changeset(email, %{}))
 
     if socket.assigns.live_action == :admin do
       socket =
@@ -161,11 +203,8 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
   end
 
   def handle_event("showReaction", %{"context" => context, "ce" => contacts_emails_id, "selected" => contact_id }, socket) do
-    # REACT TO CONTEXTS OF THIS EVENT
     case context do
       "resend" ->
-        # start modal with the contact to resend to selected
-        # update callback above with the functionality
         email_contacts = if !is_nil(contact_id) do
           Enum.filter(socket.assigns.email_contacts, fn(c) -> c == Converter.convert!(contact_id) end)
         else
@@ -221,8 +260,7 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
            email_params,
            socket.assigns.selected_email_group_contacts,
            socket.assigns.live_action,
-           if (!is_nil(socket.assigns.selected_user)) do socket.assigns.selected_user.id else nil end,
-           socket.assigns.current_user.id
+           socket.assigns.user.id
          )
       do
       {:ok, %{"email" => email, "email_changes" => email_changes, "message" => message}} ->

@@ -20,11 +20,6 @@ defmodule LiveEmailNotificationWeb.GroupContact do
             </h1>
             <p class="text-sm text-slate-500 hover:text-slate-600">Associating group (<%=@selected_group.group_name %>: <%=@selected_group.group_description %>) to contacts.</p>
           </div>
-          <div>
-            <button phx-click={@callback} type="button" class="inline-flex justify-center rounded-md text-sm font-semibold p-2 bg-slate-900 text-white hover:bg-slate-700">
-              <span class="flex items-center text-xs">Add Contacts</span>
-            </button>
-          </div>
         </div>
         <.simple_form
           for={@form}

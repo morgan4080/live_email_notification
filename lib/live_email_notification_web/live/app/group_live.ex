@@ -3,7 +3,6 @@ defmodule LiveEmailNotificationWeb.GroupLive do
   import Ecto.Query
   alias LiveEmailNotification.Repo
   alias LiveEmailNotification.Db.{Group, Contact}
-  alias LiveEmailNotification.Contexts.Accounts
 
   def render(assigns) do
     ~H"""
@@ -40,7 +39,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                   "text-xs",
                   @selected_path == "/groups" && "border-b border-brand !text-brand"
                 ]}>
-                  <%=String.split(@selected_path, "/")%>: <%=@selected_user.email%>
+                  <%=String.split(@selected_path, "/")%>: <%=@user.email%>
                 </.link>
               </div>
             </li>

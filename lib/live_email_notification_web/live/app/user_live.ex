@@ -24,8 +24,8 @@ defmodule LiveEmailNotificationWeb.UserLive do
           <:col :let={user} label="Permission"><%= user.user_type.user_type %></:col>
           <:col :let={user} label="Actions">
             <div class="space-x-1">
-              <button :if={@current_user.uuid != user.uuid} phx-click="view" phx-value-selected={user.uuid} phx-value-context="view" type="button" class="border bg-blue-50 p-0.5 cursor-pointer has-tooltip">
-                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">View</span>
+              <button :if={@current_user.uuid != user.uuid && user.user_type.user_type != "superuser"} phx-click="view" phx-value-selected={user.uuid} phx-value-context="view" type="button" class="border bg-blue-50 p-0.5 cursor-pointer has-tooltip">
+                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">View account</span>
                 <dl>
                   <dt class="sr-only">View User</dt>
                   <dd>
@@ -33,8 +33,8 @@ defmodule LiveEmailNotificationWeb.UserLive do
                   </dd>
                 </dl>
               </button>
-              <button phx-click="showModal" phx-value-selected={user.id} phx-value-context="plan" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
-                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Plan</span>
+              <button :if={@current_user.user_type.user_type == "superuser"} phx-click="showModal" phx-value-selected={user.id} phx-value-context="plan" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
+                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Change plan</span>
                 <dl>
                   <dt class="sr-only">Upgrade Plan</dt>
                   <dd>
@@ -42,8 +42,8 @@ defmodule LiveEmailNotificationWeb.UserLive do
                   </dd>
                 </dl>
               </button>
-              <button phx-click="showModal" phx-value-selected={user.id} phx-value-context="permission" type="button" class="border bg-slate-50 p-0.5 cursor-pointer has-tooltip">
-                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Permissions</span>
+              <button :if={@current_user.user_type.user_type == "superuser"} phx-click="showModal" phx-value-selected={user.id} phx-value-context="permission" type="button" class="border bg-slate-50 p-0.5 cursor-pointer has-tooltip">
+                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Change permissions</span>
                 <dl>
                   <dt class="sr-only">Change permissions</dt>
                   <dd>
@@ -51,7 +51,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
                   </dd>
                 </dl>
               </button>
-              <button :if={@current_user.uuid != user.uuid} phx-click="showModal" phx-value-selected={user.id} phx-value-context="delete" type="button" class="border bg-red-50 p-0.5 cursor-pointer has-tooltip">
+              <button :if={@current_user.uuid != user.uuid && user.user_type.user_type != "superuser"} phx-click="showModal" phx-value-selected={user.id} phx-value-context="delete" type="button" class="border bg-red-50 p-0.5 cursor-pointer has-tooltip">
                 <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Delete</span>
                 <dl>
                   <dt class="sr-only">Delete user</dt>

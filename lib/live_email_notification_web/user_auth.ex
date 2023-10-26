@@ -223,7 +223,7 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     end
   end
 
-  defp mount_uuid(params, socket, session) do
+  defp mount_uuid(params, socket, _session) do
     if Map.has_key?(params, "uuid") do
       uuid = Map.get(params, "uuid")
       case Ecto.UUID.cast(uuid) do

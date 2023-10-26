@@ -84,8 +84,8 @@ defmodule LiveEmailNotificationWeb.Router do
       live "/dashboard", DashboardLive, :index
       live "/contacts", ContactLive, :index
       live "/emails", EmailLive, :index
-      live "/emails/:email_id/contacts", EmailContactsLive, :emailcontacts
-      live "/contact/:contact_id/emails", EmailLive, :contactemails
+      live "/emails/:email_id/contacts", EmailContactsLive, :index
+      live "/contact/:contact_id/emails", EmailLive, :index
       live "/paywall", PayWallLive, :index # show user plan
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
@@ -118,8 +118,8 @@ defmodule LiveEmailNotificationWeb.Router do
       live "/admin/users", UserLive, :admin
       live "/admin/users/:uuid/dashboard", DashboardLive, :admin
       live "/admin/users/:uuid/contacts", ContactLive, :admin
-      live "/admin/users/:uuid/plan", PlanLive, :admin #upgrade user plan
-      live "/admin/users/:uuid/contact/:id/emails", EmailLive, :admin_contact
+      live "/admin/users/:uuid/emails", EmailLive, :admin
+      live "/admin/users/:uuid/emails/:email_id/contacts", EmailContactsLive, :admin
     end
   end
 

@@ -1,9 +1,6 @@
 defmodule LiveEmailNotificationWeb.DashboardLive do
   use LiveEmailNotificationWeb, :live_view
 
-  alias LiveEmailNotification.Contexts.Accounts
-  alias LiveEmailNotification.Repo
-
   def render(assigns) do
     ~H"""
       <div>
@@ -154,7 +151,7 @@ defmodule LiveEmailNotificationWeb.DashboardLive do
     """
   end
 
-  def mount(params, _session, socket) do
+  def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(
