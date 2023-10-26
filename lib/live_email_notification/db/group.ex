@@ -22,7 +22,7 @@ defmodule LiveEmailNotification.Db.Group do
     |> validate_required([:group_name])
   end
 
-  def changeset_update_contacts(group, contacts) do
+  def group_changeset_update_contacts(group, contacts) do
     group
     |> cast(%{}, [:group_name, :group_description])
     |> put_assoc(:contacts, contacts)

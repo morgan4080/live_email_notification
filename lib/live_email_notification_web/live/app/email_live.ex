@@ -257,7 +257,7 @@ defmodule LiveEmailNotificationWeb.EmailLive do
   end
 
   def handle_event("send-email", %{"email" => email_params}, socket) do
-    case Emails.send_and_update_email(
+    case Emails.associate_email_to_contacts_and_groups(
        email_params,
        socket.assigns.selected_email_group_contacts,
        socket.assigns.live_action,
@@ -265,7 +265,7 @@ defmodule LiveEmailNotificationWeb.EmailLive do
       )
     do
       {:ok, %{"email" => email, "email_changes" => email_changes, "message" => message}} ->
-        case Emails.upsert_email_contacts(email, email_changes) do
+        case Emails.upsert_email_contacts_groups_que_mails(email, email_changes) do
           {:ok, _email_id} ->
             socket = socket
                      |> assign(trigger_submit: true)

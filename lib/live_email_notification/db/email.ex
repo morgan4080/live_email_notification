@@ -22,15 +22,10 @@ defmodule LiveEmailNotification.Db.Email do
     |> validate_required([:subject, :content])
   end
 
-  def changeset_update_contacts(email, contacts, changes) do
+  def changeset_update_contacts(email, contacts, groups, changes) do
     email
     |> cast(changes, [:subject, :content])
     |> put_assoc(:contacts, contacts)
-  end
-
-  def changeset_update_groups(email, groups, changes) do
-    email
-    |> cast(changes, [:subject, :content])
     |> put_assoc(:groups, groups)
   end
 end

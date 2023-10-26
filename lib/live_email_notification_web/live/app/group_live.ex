@@ -69,7 +69,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
             <:col :let={group} label="Actions">
               <span class="space-x-1">
                 <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
-                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Contacts</span>
+                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Add Contacts</span>
                   <dl>
                     <dt class="sr-only">Add contacts to group</dt>
                     <dd>
@@ -159,7 +159,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
 
     with {:ok, _struct} <-
            group
-           |> Group.changeset_update_contacts(contacts)
+           |> Group.group_changeset_update_contacts(contacts)
            |> Repo.update() do
       {:ok, Repo.get_by(Group, id: group.id)}
     else

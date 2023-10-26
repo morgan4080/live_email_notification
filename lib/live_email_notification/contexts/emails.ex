@@ -14,9 +14,10 @@ defmodule LiveEmailNotification.Contexts.Emails do
     email.user
   end
 
-  def upsert_email_contacts(email, changes) do
+  def upsert_email_contacts_groups_que_mails(email, changes) do
     contacts = Contact |> where([c], c.id in ^changes.contacts) |> Repo.all()
-    update = Email.changeset_update_contacts(email, contacts, %{ "subject" => changes.subject, "content" => changes.content }) |> Repo.update()
+    groups = Group |> where([g], g.id in ^changes.groups) |> Repo.all()
+    update = Email.changeset_update_contacts(email, contacts, groups, %{ "subject" => changes.subject, "content" => changes.content }) |> Repo.update()
     case update do
       {:ok, email_struct} ->
         # if no contacts no jobs start
@@ -167,17 +168,17 @@ defmodule LiveEmailNotification.Contexts.Emails do
     end
   end
 
-  def send_and_update_email(email_params, selected_email_group_contacts, _live_action, selected_user_id) do
+  def associate_email_to_contacts_and_groups(email_params, selected_email_group_contacts, _live_action, selected_user_id) do
     if Map.has_key?(email_params, "contacts") do
       contact_ids = email_params["contacts"]
 
-      selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
+      selected_contacts_ints = Enum.map(contact_ids, fn contact -> Converter.convert!(contact) end)
 
       %{"content" => content, "id" => email_id, "subject" => subject, "contacts" => contacts} = %{email_params | "contacts" => selected_contacts_ints}
 
-      email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, selected_user_id)
+      email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts, groups: []}, :user_id, selected_user_id)
 
-      email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts])
+      email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts, :groups])
 
       {:ok, %{"email" => email, "email_changes" => email_changes, "message" => "Contacts associated successfully."}}
     else
@@ -188,36 +189,41 @@ defmodule LiveEmailNotification.Contexts.Emails do
           "content" => content,
           "id" => email_id,
           "subject" => subject,
-          "contacts" => contacts
+          "contacts" => contacts,
+          "groups" => groups,
         } = if length(selected_email_group_contacts) > 0 do
-              Map.put_new(email_params, "contacts", Enum.map(selected_email_group_contacts, fn  contact -> contact.id end))
+              email_params
+                |> Map.put_new("contacts", Enum.map(selected_email_group_contacts, fn  contact -> contact.id end))
+                |> Map.put_new("groups", Enum.map(group_ids, fn group -> Converter.convert!(group) end))
             else
               # when selected_email_group_contacts is empty
-              selected_groups_ints = Enum.map(group_ids, fn group -> elem(Integer.parse(group), 0) end)
-              groups = Repo.all(from g in Group,
+              selected_groups_ints = Enum.map(group_ids, fn group -> Converter.convert!(group) end)
+              groups_structs = Repo.all(from g in Group,
                                 where: g.id in ^selected_groups_ints,
                                 select: g) |> Repo.preload([:contacts])
-              contacts_lists = Enum.flat_map(groups, fn group ->
+              contacts_lists = Enum.flat_map(groups_structs, fn group ->
                 Enum.map(group.contacts, fn contact ->
                   Map.from_struct(contact.id)
                 end)
               end)
 
-              Map.put_new(email_params, "contacts", Enum.uniq(contacts_lists))
+              email_params
+              |> Map.put_new(email_params, "contacts", Enum.uniq(contacts_lists))
+              |> Map.put_new(email_params, "groups", selected_groups_ints)
             end
 
-        email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts}, :user_id, selected_user_id)
+        email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts, groups: groups}, :user_id, selected_user_id)
 
-        email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts])
+        email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts, :groups])
 
         {:ok, %{"email" => email, "email_changes" => email_changes, "message" => "Group contacts associated successfully."}}
       else
 
         %{ "id" => email_id, "content" => content, "subject" => subject } = email_params
 
-        email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: []}, :user_id, selected_user_id)
+        email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: [], groups: []}, :user_id, selected_user_id)
 
-        email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts])
+        email = Repo.get_by(Email, id: elem(Integer.parse(email_id), 0)) |> Repo.preload([:contacts, :groups])
 
         {:ok, %{"email" => email, "email_changes" => email_changes, "message" => "Contacts disassociated successfully."}}
       end

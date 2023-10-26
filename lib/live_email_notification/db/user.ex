@@ -36,7 +36,7 @@ defmodule LiveEmailNotification.Db.User do
 
   """
 
-  def changeset_update_contacts(user, customers) do
+  def changeset_update_customers(user, customers) do
     user
     |> cast(%{}, [:email, :msisdn, :password, :password_confirmation, :plan_id, :user_type_id, :invitation_code])
     |> put_assoc(:customers, customers)
