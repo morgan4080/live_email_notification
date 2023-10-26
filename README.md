@@ -25,7 +25,7 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 * The system should be able to do the following -
 
-### Problem 1 
+### Problem
  
  * A user should be able to register, then login
  * Users may have up to 2 levels of access;
@@ -48,3 +48,4 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
    f) grant admin access to a user
    g) revoke admin access to a user
 
+![ERD.png](priv%2Fstatic%2Fimages%2FERD.png)
