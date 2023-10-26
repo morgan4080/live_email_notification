@@ -63,6 +63,9 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                 <%= length(group.contacts) %>
               </button>
             </:col>
+            <:col :let={group} label="Email Count">
+              <%= length(Repo.preload(group, [:emails]).emails) %>
+            </:col>
             <:col :let={group} label="Actions">
               <span class="space-x-1">
                 <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
@@ -221,9 +224,9 @@ defmodule LiveEmailNotificationWeb.GroupLive do
 
   def handle_event("showModal", %{ "selected" => group_id, "context" => context }, socket) do
     selected_group = Repo.get_by(Group, id: elem(Integer.parse(group_id), 0))
-                     |> Repo.preload([:contacts])
-    %Group{id: id, group_name: group_name, group_description: group_description, contacts: contacts} = selected_group
-    preload_group_to_form = %Group{id: id, group_name: group_name, group_description: group_description, contacts: contacts}
+                     |> Repo.preload([:contacts, :emails])
+    %Group{id: id, group_name: group_name, group_description: group_description, contacts: contacts, emails: emails} = selected_group
+    preload_group_to_form = %Group{id: id, group_name: group_name, group_description: group_description, contacts: contacts, emails: emails}
     socket = socket
              |> assign(:modal_active, !socket.assigns.modal_active)
              |> assign(:modal_context, context)
@@ -234,6 +237,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
   end
 
   def handle_event("validate", %{"group" => group_params}, socket) do
+    IO.inspect(group_params, label: "GROUP PARAMS")
     if contact_ids = group_params["contacts"] do
       selected_contacts_ints = Enum.map(contact_ids, fn contact -> elem(Integer.parse(contact), 0) end)
       contacts = Repo.all(from c in Contact,
@@ -241,7 +245,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                         select: c) |> Repo.preload([:groups, :emails])
 
       contacts_map = Enum.map(contacts, fn contact ->
-        Map.from_struct(%{contact | groups: []})
+        Map.from_struct(%{contact | groups: [], emails: []})
       end)
 
       group_params = %{group_params | "contacts" => contacts_map}

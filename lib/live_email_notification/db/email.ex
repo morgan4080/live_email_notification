@@ -2,7 +2,7 @@ defmodule LiveEmailNotification.Db.Email do
   use Ecto.Schema
 
   import Ecto.Changeset
-  alias LiveEmailNotification.Db.{Contact, User}
+  alias LiveEmailNotification.Db.{Contact, User, Group}
 
   schema "emails" do
     field :subject, :string
@@ -10,7 +10,7 @@ defmodule LiveEmailNotification.Db.Email do
     field :is_bulk, :boolean, virtual: true, default: false
     belongs_to :user, User
     many_to_many :contacts, Contact, join_through: "contacts_emails", on_replace: :delete
-
+    many_to_many :groups, Group, join_through: "groups_emails", on_replace: :delete
     timestamps(type: :utc_datetime)
   end
 
@@ -18,6 +18,7 @@ defmodule LiveEmailNotification.Db.Email do
     email
     |> cast(attrs, [:subject, :content, :user_id, :is_bulk])
     |> cast_assoc(:contacts, with: &Contact.user_contact_changeset/2)
+    |> cast_assoc(:groups, with: &Group.group_changeset/2)
     |> validate_required([:subject, :content])
   end
 
@@ -25,5 +26,11 @@ defmodule LiveEmailNotification.Db.Email do
     email
     |> cast(changes, [:subject, :content])
     |> put_assoc(:contacts, contacts)
+  end
+
+  def changeset_update_groups(email, groups, changes) do
+    email
+    |> cast(changes, [:subject, :content])
+    |> put_assoc(:groups, groups)
   end
 end

@@ -112,17 +112,24 @@ defmodule LiveEmailNotification.Contexts.Emails do
         selected_groups_ints = Enum.map(group_ids, fn group -> elem(Integer.parse(group), 0) end)
         groups = Repo.all(from g in Group,
                           where: g.id in ^selected_groups_ints,
-                          select: g) |> Repo.preload([:contacts])
+                          select: g) |> Repo.preload([:contacts, :emails])
         contacts_lists = Enum.flat_map(groups, fn group ->
           Enum.map(group.contacts, fn contact ->
             Map.from_struct(contact)
           end)
         end)
 
+        groups_map = Enum.map(groups, fn group ->
+          Map.from_struct(%{group | contacts: [], emails: []})
+        end)
+
+        changes = %{email_params | "groups" => groups_map}
+
         changeset = Email.email_changeset(
           %Email{},
-          email_params
+          changes
         )
+
         {
           :ok,
           %{
@@ -160,7 +167,7 @@ defmodule LiveEmailNotification.Contexts.Emails do
     end
   end
 
-  def send_and_update_email(email_params, selected_email_group_contacts, live_action, selected_user_id) do
+  def send_and_update_email(email_params, selected_email_group_contacts, _live_action, selected_user_id) do
     if Map.has_key?(email_params, "contacts") do
       contact_ids = email_params["contacts"]
 
@@ -176,7 +183,7 @@ defmodule LiveEmailNotification.Contexts.Emails do
     else
       if Map.has_key?(email_params, "groups") do
         group_ids = email_params["groups"]
-        # no need for fetching contacts from groups again because they exist in socket.assigns.selected_email_group_contacts from validation
+        # also associate email to groups
         %{
           "content" => content,
           "id" => email_id,

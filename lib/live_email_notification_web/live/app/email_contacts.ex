@@ -3,7 +3,7 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
 
   import Ecto.Query
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{Email, ContactEmail, Contact}
+  alias LiveEmailNotification.Db.{Email, ContactEmail, GroupEmail, Contact}
   alias LiveEmailNotification.Contexts.{ContactsEmails, Emails, Accounts}
   alias LiveEmailNotification.Helpers.Converter
 

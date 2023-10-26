@@ -55,10 +55,11 @@ defmodule LiveEmailNotificationWeb.ContactLive do
             </h1>
             <p class="text-sm text-slate-500 hover:text-slate-600">View and add contacts to the account.</p>
           </div>
-          <.table id="contacts" rows={@user.contacts |> Repo.preload([:emails])} callback={JS.push("showAddContact", value: %{"context" => "add"})}>
+          <.table id="contacts" rows={@user.contacts |> Repo.preload([:emails, :groups])} callback={JS.push("showAddContact", value: %{"context" => "add"})}>
             <:col :let={contact} label="Contact Name"><%= contact.contact_name %></:col>
             <:col :let={contact} label="Contact Email"><%= contact.contact_email %></:col>
             <:col :let={contact} label="Email Count"><%= length(contact.emails) %></:col>
+            <:col :let={contact} label="Group Count"><%= length(contact.groups) %></:col>
             <:col :let={contact} label="Actions">
               <span class="space-x-1">
                 <button :if={@user.plan.plan_name == "Gold"} phx-click="showModal" phx-value-selected={contact.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
@@ -215,10 +216,10 @@ defmodule LiveEmailNotificationWeb.ContactLive do
       selected_groups_ints = Enum.map(group_ids, fn group -> elem(Integer.parse(group), 0) end)
       groups = Repo.all(from g in Group,
                     where: g.id in ^selected_groups_ints,
-                    select: g) |> Repo.preload([:contacts])
+                    select: g) |> Repo.preload([:contacts, :emails])
 
       groups_map = Enum.map(groups, fn group ->
-        Map.from_struct(%{group | contacts: []})
+        Map.from_struct(%{group | contacts: [], emails: []})
       end)
 
       contact_params = %{contact_params | "groups" => groups_map}
