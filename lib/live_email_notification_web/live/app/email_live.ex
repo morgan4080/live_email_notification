@@ -68,11 +68,11 @@ defmodule LiveEmailNotificationWeb.EmailLive do
             <:col :let={email} label="Actions">
               <span class="space-x-1.5">
                 <button phx-click="showModal" phx-value-selected={email.id} phx-value-context="send" type="button" class="border bg-green-50 p-0.5 cursor-pointer has-tooltip">
-                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Email</span>
+                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Send Email</span>
                   <dl>
                     <dt class="sr-only">View email</dt>
                     <dd>
-                      <Heroicons.Outline.mail class="text-green-500 h-3.5 w-3.5" />
+                      <Heroicons.Outline.paper_airplane class="text-green-500 h-3.5 w-3.5 rotate-90" />
                     </dd>
                   </dl>
                 </button>
