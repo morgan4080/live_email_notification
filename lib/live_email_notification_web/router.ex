@@ -86,7 +86,7 @@ defmodule LiveEmailNotificationWeb.Router do
       live "/emails", EmailLive, :index
       live "/emails/:email_id/contacts", EmailContactsLive, :emailcontacts
       live "/contact/:contact_id/emails", EmailLive, :contactemails
-      live "/plan", PayWallLive, :index
+      live "/paywall", PayWallLive, :index # show user plan
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
@@ -108,12 +108,17 @@ defmodule LiveEmailNotificationWeb.Router do
     pipe_through [:browser, :require_authenticated_user_admin]
 
     live_session :authenticated_user_admin,
-                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user},{LiveEmailNotificationWeb.UserAuth, :mount_current_path}],
+                 on_mount: [
+                   {LiveEmailNotificationWeb.UserAuth, :mount_current_user},
+                   {LiveEmailNotificationWeb.UserAuth, :mount_selected_user},
+                   {LiveEmailNotificationWeb.UserAuth, :mount_uuid},
+                   {LiveEmailNotificationWeb.UserAuth, :mount_current_path}
+                 ],
                  root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
       live "/admin/users", UserLive, :admin
       live "/admin/users/:uuid/dashboard", DashboardLive, :admin
       live "/admin/users/:uuid/contacts", ContactLive, :admin
-      live "/admin/users/:uuid/plan", PayWallLive, :admin
+      live "/admin/users/:uuid/plan", PlanLive, :admin #upgrade user plan
       live "/admin/users/:uuid/contact/:id/emails", EmailLive, :admin_contact
     end
   end
@@ -122,7 +127,12 @@ defmodule LiveEmailNotificationWeb.Router do
     pipe_through [:browser, :require_authenticated_user_admin_gold]
 
     live_session :authenticated_user_admin_gold,
-                 on_mount: [{LiveEmailNotificationWeb.UserAuth, :mount_current_user},{LiveEmailNotificationWeb.UserAuth, :mount_current_path}],
+                 on_mount: [
+                   {LiveEmailNotificationWeb.UserAuth, :mount_current_user},
+                   {LiveEmailNotificationWeb.UserAuth, :mount_selected_user},
+                   {LiveEmailNotificationWeb.UserAuth, :mount_uuid},
+                   {LiveEmailNotificationWeb.UserAuth, :mount_current_path}
+                 ],
                  root_layout: {LiveEmailNotificationWeb.Layouts, :authenticated} do
       live "/admin/users/:uuid/groups", GroupLive, :admin
       live "/admin/users/:uuid/group/:id/emails", EmailLive, :admin_group

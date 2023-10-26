@@ -4,7 +4,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
   import Ecto.Query
 
   alias LiveEmailNotification.Repo
-  alias LiveEmailNotification.Db.{User, Plan}
+  alias LiveEmailNotification.Db.{User, Plan, UserType}
 
 
   def render(assigns) do
@@ -24,7 +24,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
           <:col :let={user} label="Permission"><%= user.user_type.user_type %></:col>
           <:col :let={user} label="Actions">
             <div class="space-x-1">
-              <button phx-click="view" phx-value-selected={user.uuid} phx-value-context="view" type="button" class="border bg-blue-50 p-0.5 cursor-pointer has-tooltip">
+              <button :if={@current_user.uuid != user.uuid} phx-click="view" phx-value-selected={user.uuid} phx-value-context="view" type="button" class="border bg-blue-50 p-0.5 cursor-pointer has-tooltip">
                 <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">View</span>
                 <dl>
                   <dt class="sr-only">View User</dt>
@@ -33,7 +33,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
                   </dd>
                 </dl>
               </button>
-              <button phx-click="showModal" phx-value-selected={user.id} phx-value-context="upgrade" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
+              <button phx-click="showModal" phx-value-selected={user.id} phx-value-context="plan" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
                 <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Plan</span>
                 <dl>
                   <dt class="sr-only">Upgrade Plan</dt>
@@ -47,11 +47,11 @@ defmodule LiveEmailNotificationWeb.UserLive do
                 <dl>
                   <dt class="sr-only">Change permissions</dt>
                   <dd>
-                    <Heroicons.Solid.cog class="text-slate-500 h-3.5 w-3.5" />
+                    <Heroicons.Solid.key class="text-slate-500 h-3.5 w-3.5" />
                   </dd>
                 </dl>
               </button>
-              <button phx-click="showModal" phx-value-selected={user.id} phx-value-context="delete" type="button" class="border bg-red-50 p-0.5 cursor-pointer has-tooltip">
+              <button :if={@current_user.uuid != user.uuid} phx-click="showModal" phx-value-selected={user.id} phx-value-context="delete" type="button" class="border bg-red-50 p-0.5 cursor-pointer has-tooltip">
                 <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Delete</span>
                 <dl>
                   <dt class="sr-only">Delete user</dt>
@@ -68,7 +68,7 @@ defmodule LiveEmailNotificationWeb.UserLive do
           id="user-dialogue"
           show
           on_cancel={JS.navigate(~p"/admin/users")}
-          class={[@modal_context == "delete" && "!p-1"]}
+          class="!p-1"
         >
           <.live_component
             :if={@modal_context == "delete"}
@@ -81,78 +81,129 @@ defmodule LiveEmailNotificationWeb.UserLive do
             subject_id={@selected_user.id}
             error={@custom_error}
           />
+          <.live_component
+            :if={@modal_context == "plan"}
+            id="change_user_plan"
+            module={LiveEmailNotificationWeb.ChangePlan}
+            trigger_submit={@trigger_submit}
+            parent_id="user-dialogue"
+            subject={@selected_user.email}
+            subject_id={@selected_user.id}
+            plans={@plans}
+            form={@form}
+            message={"You are about to change the user plan for: " <> @selected_user.first_name <> " " <> @selected_user.last_name <> ". Select the plan you wish to change to below."}
+          />
+          <.live_component
+            :if={@modal_context == "permission"}
+            id="change_user_permission"
+            module={LiveEmailNotificationWeb.ChangePermission}
+            trigger_submit={@trigger_submit}
+            parent_id="user-dialogue"
+            subject={@selected_user.email}
+            subject_id={@selected_user.id}
+            user_types={@user_types}
+            form={@form}
+            message={"You are about to change permissions for user: " <> @selected_user.email <> ". Select the permission you wish to change to below."}
+          />
         </.dialogue>
       </div>
     """
   end
 
-  def mount_basic(socket) do
-    socket =
-      socket
-      |> assign(
-          users: []
-      )
-    socket
-  end
+  def assign_form(socket, %Ecto.Changeset{} = changeset) do
+    form = to_form(changeset, as: "user")
 
-  def mount_admin(socket) do
-    socket =
-      socket
-      |> assign(
-           users: Repo.all(from(User)) |> Repo.preload([:user_type, :plan])
-         )
-    socket
-  end
-
-  def mount_super(socket) do
-    socket =
-      socket
-      |> assign(
-           users: Repo.all(from(User)) |> Repo.preload([:user_type, :plan])
-         )
-    socket
+    if changeset.valid? do
+      assign(socket, form: form, check_errors: false)
+    else
+      assign(socket, form: form)
+    end
   end
 
   def mount(params, _session, socket) do
     socket = case socket.assigns.current_user.user_type.user_type do
       "superuser" ->
-        mount_super(socket)
+        socket =
+          socket
+          |> assign(
+               users: Repo.all(from u in User, order_by: u.inserted_at) |> Repo.preload([:user_type, :plan])
+             )
+
+        socket
       "admin" ->
-        mount_admin(socket)
-      "user" ->
-        mount_basic(socket)
+        socket =
+          socket
+          |> assign(
+               users: Repo.all(from u in User, order_by: u.inserted_at) |> Repo.preload([:user_type, :plan]) # if users belonging to certain admin
+             )
+
+        socket
       _ ->
-        mount_basic(socket)
+        socket =
+          socket
+          |> assign(
+               users: []
+             )
+
+        socket
     end
 
+    socket = socket |> assign(
+      page_title: "Users",
+      trigger_submit: false,
+      selected_user: nil,
+      check_errors: false,
+      modal_active: Map.has_key?(params, "action"),
+      modal_context: Map.get(params, "action"),
+      custom_error: nil,
+      plans: Repo.all(from(Plan)),
+      user_types: Repo.all(from(UserType))
+    ) |> assign_form(User.user_changeset(%User{}, %{}))
     {
       :ok,
       socket
-      |> assign(
-         page_title: "Users",
-         selected_user: nil,
-         check_errors: false,
-         modal_active: Map.has_key?(params, "action"),
-         modal_context: Map.get(params, "action"),
-         custom_error: nil,
-         plans: Repo.all(from(Plan))
-      )
     }
   end
 
   def handle_event("showModal", %{ "selected" => user_id, "context" => context }, socket) do
     selected_user = Repo.get_by(User, id: elem(Integer.parse(user_id), 0))
                        |> Repo.preload([:plan, :user_type])
-    socket = socket
-             |> assign(:modal_active, !socket.assigns.modal_active)
-             |> assign(:modal_context, context)
-             |> assign(:selected_user, selected_user)
+
+    socket =
+      socket
+         |> assign(:modal_active, !socket.assigns.modal_active)
+         |> assign(:modal_context, context)
+         |> assign(:selected_user, selected_user)
+         |> assign_form(User.user_changeset(selected_user, %{}))
     {:noreply, socket}
   end
 
   def handle_event("view", %{ "selected" => uuid }, socket) do
     socket = socket
              |> redirect(to: "/admin/users/#{uuid}/dashboard")
+    {:noreply, socket}
+  end
+
+  def handle_event("update", params, socket) do
+    %{"user" => user} = params
+    if Map.has_key?(user, "plan_id") do
+      IO.inspect([socket.assigns.selected_user.id, user["plan_id"]], label: "CHANGINGPLAN")
+      from(u in User, where: u.id == ^socket.assigns.selected_user.id, update: [set: [plan_id: ^user["plan_id"]]])
+      |> Repo.update_all([])
+    end
+
+    if Map.has_key?(user, "user_type_id") do
+      IO.inspect([socket.assigns.selected_user.id, user["user_type_id"]], label: "CHANGINGUSERTYPE")
+      from(u in User, where: u.id == ^socket.assigns.selected_user.id, update: [set: [user_type_id: ^user["user_type_id"]]])
+      |> Repo.update_all([])
+    end
+
+    socket = socket
+             |> assign(trigger_submit: true)
+             |> assign(:modal_active, !socket.assigns.modal_active)
+             |> put_flash(:info, "User updated successfully.")
+             |> redirect(to: ~p"/admin/users")
+
     {:noreply, socket}
   end
 

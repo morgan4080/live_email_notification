@@ -7,6 +7,7 @@ defmodule LiveEmailNotificationWeb.UserAuth do
 #  import Phoenix.Component
 
   alias LiveEmailNotification.Contexts.Accounts
+  alias LiveEmailNotification.Repo
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -153,6 +154,14 @@ defmodule LiveEmailNotificationWeb.UserAuth do
     {:cont, mount_current_user(socket, session)}
   end
 
+  def on_mount(:mount_selected_user, params, session, socket) do
+    {:cont, mount_selected_user(params, socket, session)}
+  end
+
+  def on_mount(:mount_uuid, params, session, socket) do
+    {:cont, mount_uuid(params, socket, session)}
+  end
+
   def on_mount(:mount_current_path, _params, session, socket) do
     {:cont, current_path_mount(socket, session)}
   end
@@ -188,6 +197,44 @@ defmodule LiveEmailNotificationWeb.UserAuth do
         Accounts.get_user_by_session_token(user_token)
       end
     end)
+  end
+
+  defp mount_selected_user(params, socket, session) do
+    if Map.has_key?(params, "uuid") do
+      uuid = Map.get(params, "uuid")
+      case Ecto.UUID.cast(uuid) do
+        :error ->
+          Phoenix.Component.assign_new(socket, :selected_user, fn ->
+            if user_token = session["user_token"] do
+              Accounts.get_user_by_session_token(user_token)
+            end
+          end)
+        _ ->
+          Phoenix.Component.assign_new(socket, :selected_user, fn ->
+            Accounts.get_user_by_uid(uuid) |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :emails])
+          end)
+      end
+    else
+      Phoenix.Component.assign_new(socket, :selected_user, fn ->
+        if user_token = session["user_token"] do
+          Accounts.get_user_by_session_token(user_token)
+        end
+      end)
+    end
+  end
+
+  defp mount_uuid(params, socket, session) do
+    if Map.has_key?(params, "uuid") do
+      uuid = Map.get(params, "uuid")
+      case Ecto.UUID.cast(uuid) do
+        :error ->
+          Phoenix.Component.assign(socket, :uuid, nil)
+        _ ->
+          Phoenix.Component.assign(socket, :uuid, uuid)
+      end
+    else
+      Phoenix.Component.assign(socket, :uuid, nil)
+    end
   end
 
   defp current_path_mount(socket, session) do
@@ -227,19 +274,27 @@ defmodule LiveEmailNotificationWeb.UserAuth do
 
   def require_authenticated_user_gold(conn, opts) do
     # check plan for gold throw out anyone else
-    if plan_name =  conn.assigns[:current_user].plan.plan_name do
-      if plan_name == "Gold" do
-        require_authenticated_user(conn, opts)
+    if conn.assigns[:current_user] do
+      if plan_name =  conn.assigns[:current_user].plan.plan_name do
+        if plan_name == "Gold" do
+          require_authenticated_user(conn, opts)
+        else
+          conn
+          |> put_flash(:error, "You have to be a gold member to use groups.")
+          |> maybe_store_return_to()
+          |> redirect(to: ~p"/dashboard")
+          |> halt()
+        end
       else
         conn
-        |> put_flash(:error, "You have to be a gold member to use groups.")
+        |> put_flash(:error, "Login to use.")
         |> maybe_store_return_to()
-        |> redirect(to: ~p"/dashboard")
+        |> redirect(to: ~p"/users/log_in")
         |> halt()
       end
     else
       conn
-      |> put_flash(:error, "Login to use.")
+      |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()
@@ -252,7 +307,7 @@ defmodule LiveEmailNotificationWeb.UserAuth do
   Check permissions can_view_user, can_view_permissions, can_view_plans, can_view_groups, can_view_contacts, can_view_emails
   """
   def require_authenticated_user_admin(conn, _opts) do
-    if Map.has_key?(conn.assigns, :current_user) do
+    if conn.assigns[:current_user] do
       if user_type =  conn.assigns[:current_user].user_type.user_type do
         if user_type == "admin" || user_type == "superuser" do
           conn
@@ -281,14 +336,22 @@ defmodule LiveEmailNotificationWeb.UserAuth do
 
   def require_authenticated_user_admin_gold(conn, opts) do
     # check plan for gold throw out anyone else
-    if plan_name =  conn.assigns[:current_user].plan.plan_name do
-      if plan_name == "Gold" do
-        require_authenticated_user_admin(conn, opts)
+    if conn.assigns[:current_user] do
+      if plan_name =  conn.assigns[:current_user].plan.plan_name do
+        if plan_name == "Gold" do
+          require_authenticated_user_admin(conn, opts)
+        else
+          conn
+          |> put_flash(:error, "You have to be a gold member to use groups.")
+          |> maybe_store_return_to()
+          |> redirect(to: ~p"/dashboard")
+          |> halt()
+        end
       else
         conn
-        |> put_flash(:error, "You have to be a gold member to use groups.")
+        |> put_flash(:error, "Login to use.")
         |> maybe_store_return_to()
-        |> redirect(to: ~p"/dashboard")
+        |> redirect(to: ~p"/users/log_in")
         |> halt()
       end
     else

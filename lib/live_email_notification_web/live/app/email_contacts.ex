@@ -92,7 +92,6 @@ defmodule LiveEmailNotificationWeb.EmailContactsLive do
             :if={@modal_active}
             id="email-contacts-dialogue"
             show
-            on_cancel={JS.navigate(@current_path)}
             class={[@modal_context == "delete" && "!p-1"]}
           >
             <.live_component

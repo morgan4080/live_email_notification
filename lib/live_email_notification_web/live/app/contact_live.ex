@@ -21,7 +21,7 @@ defmodule LiveEmailNotificationWeb.ContactLive do
           <:col :let={contact} label="Contact Email"><%= contact.contact_email %></:col>
           <:col :let={contact} label="Actions">
             <span class="space-x-1">
-              <button phx-click="showModal" phx-value-selected={contact.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
+              <button :if={@current_user.plan.plan_name == "Gold"} phx-click="showModal" phx-value-selected={contact.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
                 <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Group</span>
                 <dl>
                   <dt class="sr-only">Add to group</dt>

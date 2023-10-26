@@ -20,18 +20,18 @@ Repo.insert! %Plan{
 }
 
 
-Repo.insert! %Plan{
-  plan_name: "Bronze",
-  price: 500.0,
-  plan_description: "Better plan"
-}
-
-
-Repo.insert! %Plan{
-  plan_name: "Silver",
-  price: 800.0,
-  plan_description: "Good plan"
-}
+#Repo.insert! %Plan{
+#  plan_name: "Bronze",
+#  price: 500.0,
+#  plan_description: "Better plan"
+#}
+#
+#
+#Repo.insert! %Plan{
+#  plan_name: "Silver",
+#  price: 800.0,
+#  plan_description: "Good plan"
+#}
 
 
 Repo.insert! %Plan{

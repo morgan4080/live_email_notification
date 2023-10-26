@@ -13,6 +13,10 @@ defmodule LiveEmailNotificationWeb.PlanLive do
     """
   end
 
+  # load uuid users plan
+  # load current users plan
+  # load all available plans
+
   def mount(_, _session, socket) do
     {:ok, assign(socket, page_title: "Plan")}
   end

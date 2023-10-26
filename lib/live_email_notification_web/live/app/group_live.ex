@@ -7,105 +7,145 @@ defmodule LiveEmailNotificationWeb.GroupLive do
 
   def render(assigns) do
     ~H"""
-      <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise relative">
-            <.link href={~p"/users/settings"} class="text-brand"><%= @user.first_name <> "'s" %></.link> <%= String.split(@current_path, "/") %>
-            <button phx-click="showAddGroup" phx-value-context="add" type="button" class="absolute right-0 inline-flex justify-center rounded-full text-sm font-semibold p-2 px-3 bg-slate-900 text-white hover:bg-slate-700">
-              <span class="flex items-center text-xs">Add <span class="ml-1" aria-hidden="true"><Heroicons.Solid.plus class="h-2.5 w-2.5" /></span></span>
-            </button>
-          </h1>
-          <p class="text-sm text-slate-500 hover:text-slate-600">View and add groups to your account.</p>
+      <div>
+        <nav :if={@live_action == :admin} class="flex px-4 sm:px-6 lg:px-8" aria-label="Breadcrumb">
+          <ol role="list" class="flex justify-center">
+            <li>
+              <div>
+                <.link href={~p"/dashboard"}>
+                  <Heroicons.Solid.home class="text-gray-500 h-4 w-4" />
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <.link href={~p"/admin/users"} class="text-xs">
+                   users
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <.link href={"/admin/users/#{@uuid}/dashboard"} class="text-xs">
+                   dashboard
+                </.link>
+              </div>
+            </li>
+            <li>
+              <div class="flex justify-center">
+                <Heroicons.Solid.chevron_right class="text-gray-500 h-4 w-4 shrink-0" />
+                <.link href={"/admin/users/#{@uuid}/groups"} class={[
+                  "text-xs",
+                  @selected_path == "/groups" && "border-b border-brand !text-brand"
+                ]}>
+                  <%=String.split(@selected_path, "/")%>: <%=@selected_user.email%>
+                </.link>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <div class="mx-auto px-4 py-6 sm:px-6 space-y-1 lg:px-8">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900 capitalise relative">
+              Groups
+              <button phx-click="showAddGroup" phx-value-context="add" type="button" class="absolute right-0 inline-flex justify-center rounded-full text-sm font-semibold p-2 px-3 bg-slate-900 text-white hover:bg-slate-700">
+                <span class="flex items-center text-xs">Add <span class="ml-1" aria-hidden="true"><Heroicons.Solid.plus class="h-2.5 w-2.5" /></span></span>
+              </button>
+            </h1>
+            <p class="text-sm text-slate-500 hover:text-slate-600">View and add groups to the account.</p>
+          </div>
+          <.table id="groups" rows={@groups} callback={JS.push("showAddGroup", value: %{"context" => "add"})}>
+            <:col :let={group} label="Group Name"><%= group.group_name %></:col>
+            <:col :let={group} label="Group Description"><%= group.group_description %></:col>
+            <:col :let={group} label="Contacts Count">
+              <%= group.group_description %>
+            </:col>
+            <:col :let={group} label="Actions">
+              <span class="space-x-1">
+                <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
+                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Contacts</span>
+                  <dl>
+                    <dt class="sr-only">Add contacts to group</dt>
+                    <dd>
+                      <Heroicons.Outline.plus class="text-teal-500 h-3.5 w-3.5" />
+                    </dd>
+                  </dl>
+                </button>
+                <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="edit" type="button" class="border bg-zinc-50 p-0.5 cursor-pointer has-tooltip">
+                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Edit</span>
+                  <dl>
+                    <dt class="sr-only">Edit group</dt>
+                    <dd>
+                      <Heroicons.Outline.pencil class="text-zinc-500 h-3.5 w-3.5" />
+                    </dd>
+                  </dl>
+                </button>
+                <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="delete" type="button" class="border bg-red-50 p-0.5 cursor-pointer has-tooltip">
+                  <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Delete</span>
+                  <dl>
+                    <dt class="sr-only">Delete group</dt>
+                    <dd>
+                      <Heroicons.Outline.trash class="text-red-500 h-3.5 w-3.5" />
+                    </dd>
+                  </dl>
+                </button>
+              </span>
+            </:col>
+          </.table>
+          <.dialogue
+            :if={@modal_active}
+            id="group-dialogue"
+            show
+            on_cancel={JS.navigate(@current_path)}
+            class={[@modal_context == "delete" && "!p-1"]}
+          >
+            <.live_component
+              :if={@modal_context == "add"}
+              module={LiveEmailNotificationWeb.CreateGroup}
+              id="create_group"
+              form={@form}
+              current_user={@user}
+              trigger_submit={@trigger_submit}
+              check_errors={@check_errors}
+            />
+            <.live_component
+              :if={@modal_context == "group"}
+              module={LiveEmailNotificationWeb.GroupContact}
+              id="add_contact_group"
+              title="Add Group to Contacts"
+              contact={@selected_group}
+              form={@form}
+              current_user={@user}
+              trigger_submit={@trigger_submit}
+              group_contacts={@group_contacts}
+              selected_group={@selected_group}
+              check_errors={@check_errors}
+              callback={JS.navigate(~p"/contacts?action=add")}
+            />
+            <.live_component
+              :if={@modal_context == "edit"}
+              module={LiveEmailNotificationWeb.UpdateGroup}
+              id="update_group"
+              form={@form}
+              current_user={@user}
+              trigger_submit={@trigger_submit}
+              check_errors={@check_errors}
+            />
+            <.live_component
+              :if={@modal_context == "delete"}
+              module={LiveEmailNotificationWeb.DeleteConfirm}
+              id="delete_group"
+              parent_id="group-dialogue"
+              title="Delete Group"
+              message="Are you sure you want to delete group? This action cannot be undone."
+              subject={@selected_group.group_name}
+              subject_id={@selected_group.id}
+              error={@custom_error}
+            />
+          </.dialogue>
         </div>
-        <.table id="groups" rows={@groups} callback={JS.push("showAddGroup", value: %{"context" => "add"})}>
-          <:col :let={group} label="Group Name"><%= group.group_name %></:col>
-          <:col :let={group} label="Group Description"><%= group.group_description %></:col>
-          <:col :let={group} label="Contacts Count">
-            <%= group.group_description %>
-          </:col>
-          <:col :let={group} label="Actions">
-            <span class="space-x-1">
-              <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">
-                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Contacts</span>
-                <dl>
-                  <dt class="sr-only">Add contacts to group</dt>
-                  <dd>
-                    <Heroicons.Outline.plus class="text-teal-500 h-3.5 w-3.5" />
-                  </dd>
-                </dl>
-              </button>
-              <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="edit" type="button" class="border bg-zinc-50 p-0.5 cursor-pointer has-tooltip">
-                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Edit</span>
-                <dl>
-                  <dt class="sr-only">Edit group</dt>
-                  <dd>
-                    <Heroicons.Outline.pencil class="text-zinc-500 h-3.5 w-3.5" />
-                  </dd>
-                </dl>
-              </button>
-              <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="delete" type="button" class="border bg-red-50 p-0.5 cursor-pointer has-tooltip">
-                <span class="tooltip rounded shadow-lg p-1 bg-black text-white -mt-8 text-xs">Delete</span>
-                <dl>
-                  <dt class="sr-only">Delete group</dt>
-                  <dd>
-                    <Heroicons.Outline.trash class="text-red-500 h-3.5 w-3.5" />
-                  </dd>
-                </dl>
-              </button>
-            </span>
-          </:col>
-        </.table>
-        <.dialogue
-          :if={@modal_active}
-          id="group-dialogue"
-          show
-          on_cancel={JS.navigate(~p"/groups")}
-          class={[@modal_context == "delete" && "!p-1"]}
-        >
-          <.live_component
-            :if={@modal_context == "add"}
-            module={LiveEmailNotificationWeb.CreateGroup}
-            id="create_group"
-            form={@form}
-            current_user={@user}
-            trigger_submit={@trigger_submit}
-            check_errors={@check_errors}
-          />
-          <.live_component
-            :if={@modal_context == "group"}
-            module={LiveEmailNotificationWeb.GroupContact}
-            id="add_contact_group"
-            title="Add Group to Contacts"
-            contact={@selected_group}
-            form={@form}
-            current_user={@user}
-            trigger_submit={@trigger_submit}
-            group_contacts={@group_contacts}
-            selected_group={@selected_group}
-            check_errors={@check_errors}
-            callback={JS.navigate(~p"/contacts?action=add")}
-          />
-          <.live_component
-            :if={@modal_context == "edit"}
-            module={LiveEmailNotificationWeb.UpdateGroup}
-            id="update_group"
-            form={@form}
-            current_user={@user}
-            trigger_submit={@trigger_submit}
-            check_errors={@check_errors}
-          />
-          <.live_component
-            :if={@modal_context == "delete"}
-            module={LiveEmailNotificationWeb.DeleteConfirm}
-            id="delete_group"
-            parent_id="group-dialogue"
-            title="Delete Group"
-            message="Are you sure you want to delete group? This action cannot be undone."
-            subject={@selected_group.group_name}
-            subject_id={@selected_group.id}
-            error={@custom_error}
-          />
-        </.dialogue>
       </div>
     """
   end
@@ -155,28 +195,15 @@ defmodule LiveEmailNotificationWeb.GroupLive do
            modal_context: Map.get(params, "action"),
            custom_error: nil,
            selected_group: nil,
+           selected_path: "/groups",
            group_contacts: [],
            page_title: "Groups",
-           user: socket.assigns.current_user,
-           groups: socket.assigns.current_user.groups # TODO UUID
+           user: if (socket.assigns.live_action == :admin) do socket.assigns.selected_user else socket.assigns.current_user end,
+           groups: if (socket.assigns.live_action == :admin) do socket.assigns.selected_user.groups else socket.assigns.current_user.groups  end
          )
       |> assign_form(Group.group_changeset(%Group{}, %{}))
 
-      if socket.assigns.live_action == :admin && Map.has_key?(params, "uuid") do
-        %{"uuid" => uuid} = params
-        user = Accounts.get_user_by_uid(uuid) |> Repo.preload([:plan, :user_type, :roles, :groups, :contacts, :role_permissions, :emails])
-        socket =
-          socket
-          |> assign(
-               page_title: "Dashboard",
-               uuid: uuid,
-               user: user,
-               groups: user.groups
-             )
-        {:ok, socket}
-      else
-        {:ok, socket}
-      end
+    {:ok, socket}
   end
 
   def handle_event("showAddGroup", %{ "context" => context }, socket) do
@@ -242,7 +269,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                    |> assign(trigger_submit: true)
                    |> assign_form(Group.group_changeset(group, group_params))
                    |> put_flash(:info, "Group created successfully.")
-                   |> redirect(to: ~p"/groups")
+                   |> redirect(to: socket.assigns.current_path)
           {:noreply, socket}
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply, assign_form(socket, changeset)}
@@ -262,7 +289,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                |> assign(trigger_submit: true)
                |> assign(:modal_active, !socket.assigns.modal_active)
                |> put_flash(:info, "Group updated successfully.")
-               |> redirect(to: ~p"/groups")
+               |> redirect(to: socket.assigns.current_path)
       {:noreply, socket}
     catch
       message ->
@@ -285,7 +312,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                    |> assign(trigger_submit: true)
                    |> assign_form(Group.group_changeset(%Group{}, group_params))
                    |> put_flash(:info, "Contacts associated successfully.")
-                   |> redirect(to: ~p"/groups")
+                   |> redirect(to: socket.assigns.current_path)
           {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
         {:error, _message} ->
           socket = socket
@@ -304,7 +331,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
                    |> assign(trigger_submit: true)
                    |> assign_form(Group.group_changeset(%Group{}, group_params))
                    |> put_flash(:info, "Contacts disassociated successfully.")
-                   |> redirect(to: ~p"/groups")
+                   |> redirect(to: socket.assigns.current_path)
           {:noreply, assign_form(socket, Map.put(%Ecto.Changeset{}, :action, :update))}
         {:error, _message} ->
           socket = socket
@@ -322,7 +349,7 @@ defmodule LiveEmailNotificationWeb.GroupLive do
       socket = socket
                |> assign(:modal_active, !socket.assigns.modal_active)
                |> put_flash(:info, "Group deleted successfully.")
-               |> redirect(to: ~p"/groups")
+               |> redirect(to: socket.assigns.current_path)
       {:noreply, socket}
     catch
       message ->
