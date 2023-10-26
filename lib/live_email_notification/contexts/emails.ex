@@ -208,8 +208,8 @@ defmodule LiveEmailNotification.Contexts.Emails do
               end)
 
               email_params
-              |> Map.put_new(email_params, "contacts", Enum.uniq(contacts_lists))
-              |> Map.put_new(email_params, "groups", selected_groups_ints)
+              |> Map.put_new("contacts", Enum.uniq(contacts_lists))
+              |> Map.put_new("groups", selected_groups_ints)
             end
 
         email_changes = Map.put_new(%Email{subject: subject, content: content, contacts: contacts, groups: groups}, :user_id, selected_user_id)
