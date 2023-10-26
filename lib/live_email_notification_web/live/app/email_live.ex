@@ -56,9 +56,14 @@ defmodule LiveEmailNotificationWeb.EmailLive do
             </h1>
             <p class="text-sm text-slate-500 hover:text-slate-600">View and send emails for account.</p>
           </div>
-          <.table id="emails" rows={@user.emails} callback={JS.push("showAddEmail", value: %{"context" => "add"})}>
+          <.table id="emails" rows={@user.emails |> Repo.preload([:contacts])} callback={JS.push("showAddEmail", value: %{"context" => "add"})}>
             <:col :let={email} label="Subject"><p class="max-w-xs overflow-hidden text-ellipsis"><%= email.subject %></p></:col>
             <:col :let={email} label="Content"><p class="line-clamp-3 max-w-md"><%= email.content %></p></:col>
+            <:col :let={email} label="Contacts Count">
+              <.link href={"#{@current_path}/#{email.id}/contacts"} class="text-blue-400">
+                <%= length(email.contacts) %>
+              </.link>
+            </:col>
             <:col :let={email} label="Created"><%= email.inserted_at%></:col>
             <:col :let={email} label="Actions">
               <span class="space-x-1.5">

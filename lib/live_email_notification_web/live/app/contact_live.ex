@@ -55,9 +55,10 @@ defmodule LiveEmailNotificationWeb.ContactLive do
             </h1>
             <p class="text-sm text-slate-500 hover:text-slate-600">View and add contacts to the account.</p>
           </div>
-          <.table id="contacts" rows={@user.contacts} callback={JS.push("showAddContact", value: %{"context" => "add"})}>
+          <.table id="contacts" rows={@user.contacts |> Repo.preload([:emails])} callback={JS.push("showAddContact", value: %{"context" => "add"})}>
             <:col :let={contact} label="Contact Name"><%= contact.contact_name %></:col>
             <:col :let={contact} label="Contact Email"><%= contact.contact_email %></:col>
+            <:col :let={contact} label="Email Count"><%= length(contact.emails) %></:col>
             <:col :let={contact} label="Actions">
               <span class="space-x-1">
                 <button :if={@user.plan.plan_name == "Gold"} phx-click="showModal" phx-value-selected={contact.id} phx-value-context="group" type="button" class="border bg-teal-50 p-0.5 cursor-pointer has-tooltip">

@@ -59,7 +59,9 @@ defmodule LiveEmailNotificationWeb.GroupLive do
             <:col :let={group} label="Group Name"><%= group.group_name %></:col>
             <:col :let={group} label="Group Description"><%= group.group_description %></:col>
             <:col :let={group} label="Contacts Count">
-              <%= group.group_description %>
+              <button phx-click="showModal" phx-value-selected={group.id} phx-value-context="group" type="button" class="text-blue-400">
+                <%= length(group.contacts) %>
+              </button>
             </:col>
             <:col :let={group} label="Actions">
               <span class="space-x-1">
@@ -198,7 +200,11 @@ defmodule LiveEmailNotificationWeb.GroupLive do
            group_contacts: [],
            page_title: "Groups",
            user: if (socket.assigns.live_action == :admin) do socket.assigns.selected_user else socket.assigns.current_user end,
-           groups: if (socket.assigns.live_action == :admin) do socket.assigns.selected_user.groups else socket.assigns.current_user.groups  end
+           groups: if (socket.assigns.live_action == :admin) do
+             socket.assigns.selected_user.groups |> Repo.preload([:contacts])
+           else
+             socket.assigns.current_user.groups |> Repo.preload([:contacts])
+           end
          )
       |> assign_form(Group.group_changeset(%Group{}, %{}))
 
