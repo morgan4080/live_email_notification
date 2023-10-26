@@ -98,20 +98,20 @@ defmodule LiveEmailNotification.Contexts.Accounts do
   """
   def register_user(attrs) do
     # assign super user gold plan by default
-    plan = if attrs["invitation_code"] == "254720753971S" do
+    plan = if attrs["invitation_code"] == "VALUES" do
       Plan |> where([plan], plan.plan_name == "Gold") |> Repo.all() |> List.last()
     else
-      if attrs["invitation_code"] == "254720753971A" do
+      if attrs["invitation_code"] == "VALUEA" do
         Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
       else
         Plan |> where([plan], plan.plan_name == "Basic") |> Repo.all() |> List.last()
       end
     end
 
-    ut = if attrs["invitation_code"] == "254720753971S" do
+    ut = if attrs["invitation_code"] == "VALUES" do
       %{%{ name: "user" } | name: "superuser"}
     else
-      if attrs["invitation_code"] == "254720753971A" do
+      if attrs["invitation_code"] == "VALUEA" do
         %{%{ name: "user" } | name: "admin"}
       else
         %{%{ name: "user" } | name: "user"}

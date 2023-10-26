@@ -20,6 +20,7 @@ To start your Phoenix server:
   * Run `mix ecto.migrate`
   * Run `mix run priv/repo/seeds.exs`
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+  * Sign up with invitation code "VALUEA" for ADMIN & "VALUES" for SUPERUSER
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
@@ -47,5 +48,8 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
    e) show status of group emails - number sent, number pending and list of failed contacts
    f) grant admin access to a user
    g) revoke admin access to a user
+
+
+## SOLUTION
 
 ![ERD.png](priv%2Fstatic%2Fimages%2FERD.png)
